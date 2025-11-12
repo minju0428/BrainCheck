@@ -32,6 +32,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //ai 관련 의존성
+    implementation 'com.google.genai:google-genai:1.0.0'
 }
 
 tasks.named('test') {
