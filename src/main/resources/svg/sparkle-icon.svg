@@ -1,0 +1,20 @@
+<svg width="300" height="300" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- 메인 별 모양 -->
+    <path d="M60 15 C65 32, 75 42, 90 50 C75 58, 65 68, 60 85 C55 68, 45 58, 30 50 C45 42, 55 32, 60 15 Z"
+          fill="none"
+          stroke="#8B3FD9"
+          stroke-width="8"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+
+    <!-- 오른쪽 위 플러스 기호 -->
+    <line x1="95" y1="25" x2="95" y2="35"
+          stroke="#8B3FD9"
+          stroke-width="6"
+          stroke-linecap="round"/>
+    <line x1="90" y1="30" x2="100" y2="30"
+          stroke="#8B3FD9"
+          stroke-width="6"
+          stroke-linecap="round"/>
+</svg>
+
