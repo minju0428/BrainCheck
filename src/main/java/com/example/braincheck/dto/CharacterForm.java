@@ -16,31 +16,38 @@ public class CharacterForm {
     @NotBlank(message = "카테고리를 선택해 주세요.")
     private String category;
 
-    //선택항목
-    private String characterDescription;
 
-    //Setter 메서드
-    public void setCharacterName() {
+    //Setter 메서드 : 객체의 데이터를 외부에서 설정(수정)할 수 있는 통로를 제공
+    public void setCharacterName(String characterName) {
+        this.characterName = characterName;
+    }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
 
-    //Getter 메서드
+    //Getter 메서드 : 객체의 데이터를 외부에서 읽어갈 수 있는 통로를 제공
     public String getCharacterName() {
+
         return characterName;
     }
 
     public String getTitle() {
+
         return title;
     }
 
     public String getCategory() {
+
         return category;
     }
 
-    public String getCharacterDescription() {
-        return characterDescription;
-    }
+
 
 
 }
