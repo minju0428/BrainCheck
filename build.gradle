@@ -36,7 +36,7 @@ dependencies {
 
     //ai 관련 의존성
     implementation 'com.google.genai:google-genai:1.0.0'
-
+    implementation 'com.google.cloud:google-cloud-vertexai:3.32.0'
 
 }
 
