@@ -12,6 +12,10 @@
             --secondary-pink: #ff3ca6;
             /* 배경 그라데이션 */
             --bg-gradient: radial-gradient(circle at top left, #e0f2fe 0%, #f3e8ff 50%, #ffffff 100%);
+
+            /* 버튼 그라데이션 정의 */
+            --button-gradient-base: linear-gradient(90deg, #b862ff, #ff71c6); /* 연한 보라/핑크 그라데이션 */
+            --button-gradient-hover: linear-gradient(90deg, #a238ff, #ff3ca6); /* 진한 보라/핑크 (호버/클릭 시 색상) */
         }
 
         /* 폰트 및 배경 그라데이션 설정 */
@@ -28,6 +32,7 @@
             padding: 20px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             border: 1px solid #ede9fe;
+            margin-bottom: 24px;
         }
 
         /* 선택지 카드 스타일 */
@@ -97,6 +102,69 @@
             border-radius: 2px;
             background: linear-gradient(90deg, var(--primary-purple), #ff84e8);
         }
+
+        /* 각 MBTI 축 제목의 보조선 스타일 */
+        .axis-title-accent {
+            position: relative;
+            margin-bottom: 20px; /* 제목과 아래 카드 그룹 사이 간격 */
+            padding-bottom: 8px; /* 텍스트와 선 사이의 간격 */
+            text-align: center; /* 텍스트를 중앙 정렬 */
+            box-sizing: border-box;
+        }
+        .axis-title-accent::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            width: 80%; /* 선의 너비 */
+            max-width: 150px; /* 최대 너비 제한 */
+            height: 3px;
+            border-radius: 1.5px;
+            background: linear-gradient(90deg, var(--primary-purple), #ff84e8);
+        }
+
+        /* 버튼 기본 스타일 (텍스트 및 아이콘 포함) */
+        #predict-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: background-image 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* 비활성화 상태 (연한 그라데이션 배경, 텍스트와 아이콘 연하게 표시) */
+        #predict-button:disabled {
+            background-image: var(--button-gradient-base);
+            color: white;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* 활성화 상태 (연한 그라데이션 배경, 텍스트와 아이콘 선명하게 표시) */
+        #predict-button:not(:disabled) {
+            background-image: var(--button-gradient-base);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(162, 56, 255, 0.4);
+        }
+
+        /* 활성화 상태에서 마우스 오버 시 (진한 그라데이션) */
+        #predict-button:not(:disabled):hover {
+            background-image: var(--button-gradient-hover);
+        }
+
+        /* 비활성화 상태에서는 텍스트와 아이콘을 연하게 (흐리게) 처리 */
+        #predict-button:disabled #button-text,
+        #predict-button:disabled #button-icon {
+            opacity: 0.5;
+        }
+
+        /* 활성화 상태에서는 텍스트와 아이콘을 선명하게 */
+        #predict-button:not(:disabled) #button-text,
+        #predict-button:not(:disabled) #button-icon {
+            opacity: 1;
+        }
     </style>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -111,13 +179,12 @@
 
     <div class="space-y-6 pt-0">
 
-        <div class="section-title-accent">
+        <div class="section-title-accent mb-6">
             <h2 class="text-xl font-bold text-gray-800">내가 생각하는 캐릭터의 MBTI 유형을 선택하세요</h2>
         </div>
 
         <div class="choice-group" data-axis="ei">
-            <p class="text-base font-semibold text-gray-800">에너지 방향</p>
-            <p class="text-sm text-gray-600 mb-3">E / I</p>
+            <p class="text-base font-semibold text-gray-800 axis-title-accent">에너지 방향</p>
             <div class="grid grid-cols-2 gap-4">
                 <div class="choice-card" data-value="E">
                     <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
@@ -137,8 +204,7 @@
         </div>
 
         <div class="choice-group" data-axis="sn">
-            <p class="text-base font-semibold text-gray-800">인식 기능</p>
-            <p class="text-sm text-gray-600 mb-3">S / N</p>
+            <p class="text-base font-semibold text-gray-800 axis-title-accent">인식 기능</p>
             <div class="grid grid-cols-2 gap-4">
                 <div class="choice-card" data-value="S">
                     <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
@@ -158,8 +224,7 @@
         </div>
 
         <div class="choice-group" data-axis="tf">
-            <p class="text-base font-semibold text-gray-800">판단 기능</p>
-            <p class="text-sm text-gray-600 mb-3">T / F</p>
+            <p class="text-base font-semibold text-gray-800 axis-title-accent">판단 기능</p>
             <div class="grid grid-cols-2 gap-4">
                 <div class="choice-card" data-value="T">
                     <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
@@ -179,8 +244,7 @@
         </div>
 
         <div class="choice-group" data-axis="jp">
-            <p class="text-base font-semibold text-gray-800">생활 양식</p>
-            <p class="text-sm text-gray-600 mb-3">J / P</p>
+            <p class="text-base font-semibold text-gray-800 axis-title-accent">생활 양식</p>
             <div class="grid grid-cols-2 gap-4">
                 <div class="choice-card" data-value="J">
                     <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
@@ -199,9 +263,10 @@
             </div>
         </div>
 
-        <div class="pt-6">
-            <button id="predict-button" class="w-full bg-gray-300 text-gray-600 font-bold py-3 rounded-full shadow-lg transition duration-150 text-lg" disabled>
-                MBTI 예측 완료하기
+        <div class="pt-3">
+            <button id="predict-button" class="w-full font-bold py-3 rounded-full shadow-lg text-lg" disabled>
+                <span id="button-text">AI 분석 결과 확인하기</span>
+                <i id="button-icon" data-lucide="arrow-right" class="w-5 h-5"></i>
             </button>
         </div>
 
@@ -229,13 +294,12 @@
         });
 
         if (allSelected) {
+            // 활성화 상태
             predictButton.disabled = false;
-            predictButton.classList.remove('bg-gray-300', 'text-gray-600');
-            predictButton.classList.add('bg-purple-600', 'text-white', 'hover:bg-purple-700');
+
         } else {
+            // 비활성화 상태
             predictButton.disabled = true;
-            predictButton.classList.remove('bg-purple-600', 'text-white', 'hover:bg-purple-700');
-            predictButton.classList.add('bg-gray-300', 'text-gray-600');
         }
     }
 
@@ -257,14 +321,10 @@
 
             // 3. 버튼 상태 업데이트
             updateButtonState();
-
-            // (선택된 MBTI 값 확인용)
-            // console.log("Selected MBTI values:", selectedValues);
         });
     });
 
-    // 초기 버튼 상태 업데이트 (모두 선택되지 않았으므로 비활성화 상태)
+    // 초기 버튼 상태 업데이트
     updateButtonState();
 </script>
 </body>
-</html>
