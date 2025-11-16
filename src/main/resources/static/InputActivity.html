@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>캐릭터 분석 정보 입력</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 커스텀 Tailwind 설정 */
+    :root {
+      --primary-purple: #a238ff;
+      --secondary-pink: #ff3ca6;
+    }
+
+    /* 폰트 설정 */
+    body { font-family: 'Inter', sans-serif; }
+
+    /* 버튼 그라데이션 스타일 */
+    .btn-gradient {
+      background: linear-gradient(90deg, var(--primary-purple), var(--secondary-pink));
+    }
+
+    /* 카테고리 선택 버튼 기본 스타일 */
+    .category-card {
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+
+    /* 카테고리 선택 시 스타일 */
+    .category-card.selected {
+      border: 2px solid var(--primary-purple);
+      box-shadow: 0 4px 15px rgba(162, 56, 255, 0.2);
+      background-color: #f7f0ff;
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="flex justify-center py-10 md:py-20 px-4" style="background-color: rgb(240, 248, 255);">
+
+<div class="max-w-xl w-full space-y-8">
+
+  <div class="max-w-xl w-full bg-white p-6 md:p-10 rounded-xl shadow-2xl space-y-8">
+
+    <div>
+      <label for="characterName" class="block text-gray-700 font-semibold mb-2">
+        등장인물 이름 <span class="text-red-500">*</span>
+      </label>
+      <input type="text" id="characterName" name="characterName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 placeholder-gray-400"
+             placeholder="예: 해리 포터, 셜록 홈즈, 토니 스타크" required>
+    </div>
+
+    <div>
+      <label for="title" class="block text-gray-700 font-semibold mb-2">
+        작품 제목 <span class="text-red-500">*</span>
+      </label>
+      <input type="text" id="title" name="title" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 placeholder-gray-400"
+             placeholder="예: 해리 포터 시리즈, 셜록, 아이언맨" required>
+    </div>
+
+    <div>
+      <label class="block text-gray-700 font-semibold mb-4">
+        카테고리 <span class="text-red-500">*</span>
+      </label>
+      <input type="hidden" id="category" name="category" value="movie" required>
+      <div id="category-selection" class="grid grid-cols-3 gap-4">
+
+        <div class="category-card flex flex-col items-center justify-center p-4 h-28 bg-white rounded-xl shadow-md cursor-pointer hover:shadow-lg" data-value="book">
+          <i data-lucide="book" class="w-8 h-8 text-purple-600 mb-2"></i> <span class="text-sm font-medium text-gray-700">책</span>
+        </div>
+
+        <div class="category-card flex flex-col items-center justify-center p-4 h-28 bg-white rounded-xl shadow-md cursor-pointer hover:shadow-lg" data-value="drama">
+          <i data-lucide="tv" class="w-8 h-8 text-purple-600 mb-2"></i>
+          <span class="text-sm font-medium text-gray-700">드라마</span>
+        </div>
+
+        <div class="category-card selected flex flex-col items-center justify-center p-4 h-28 bg-white rounded-xl shadow-lg cursor-pointer hover:shadow-xl" data-value="movie">
+          <i data-lucide="film" class="w-8 h-8 text-purple-600 mb-2"></i>
+          <span class="text-sm font-medium text-gray-700">영화</span>
+        </div>
+
+      </div>
+    </div>
+
+
+    <button class="btn-gradient w-full text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition duration-150 flex items-center justify-center text-lg">
+      다음 단계로 <i data-lucide="arrow-right" class="ml-2 w-6 h-6"></i>
+    </button>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-300">
+    <h2 class="text-lg font-bold text-purple-700 flex items-center mb-4">
+      <i data-lucide="lightbulb" class="w-5 h-5 mr-2 text-yellow-500 fill-yellow-200"></i> 입력 팁
+    </h2>
+    <ul class="list-disc ml-6 text-gray-700 space-y-2">
+      <li><strong>등장인물 이름</strong>은 정확하게 입력해주세요.</li>
+      <li><strong>작품 제목</strong>은 책/드라마/영화의 공식 제목을 입력하면 좋습니다.</li>
+      <li>한 작품에서 여러 캐릭터를 분석하고 싶다면, 각각 따로 입력하세요</li>
+      <li>캐릭터에 대해 잘 알수록 정확한 MBTI 분석이 가능합니다</li>
+    </ul>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-300 space-y-4">
+    <h2 class="text-lg font-bold text-blue-700 flex items-center mb-4">
+      <i data-lucide="book-open" class="w-5 h-5 mr-2 text-green-500"></i> 입력 예시
+    </h2>
+
+    <div class="grid grid-cols-3 text-sm font-semibold text-gray-500 border-b pb-2">
+      <div>등장인물</div>
+      <div>작품</div>
+      <div class="text-center">카테고리</div>
+    </div>
+
+    <div class="grid grid-cols-3 items-center py-2 border-b last:border-b-0">
+      <div class="font-medium text-gray-700">해리 포터</div>
+      <div class="text-gray-600">해리 포터 시리즈</div>
+      <div class="flex justify-center items-center text-sm text-blue-600">
+        <i data-lucide="book" class="w-4 h-4 mr-1"></i> 책
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 items-center py-2 border-b last:border-b-0">
+      <div class="font-medium text-gray-700">월터 화이트</div>
+      <div class="text-gray-600">브레이킹 배드</div>
+      <div class="flex justify-center items-center text-sm text-green-600">
+        <i data-lucide="tv" class="w-4 h-4 mr-1"></i> 드라마
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 items-center py-2">
+      <div class="font-medium text-gray-700">토니 스타크</div>
+      <div class="text-gray-600">아이언맨</div>
+      <div class="flex justify-center items-center text-sm text-red-600">
+        <i data-lucide="film" class="w-4 h-4 mr-1"></i> 영화
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  // Lucide Icons 초기화 (아이콘 렌더링)
+  lucide.createIcons();
+
+  const categorySelection = document.getElementById('category-selection');
+  const categoryCards = categorySelection.querySelectorAll('.category-card');
+
+  // 숨겨진 input 필드 참조
+  const categoryInput = document.getElementById('category');
+
+  categoryCards.forEach(card => {
+    card.addEventListener('click', () => {
+      // 모든 카드에서 selected 클래스 제거
+      categoryCards.forEach(c => c.classList.remove('selected', 'shadow-lg', 'hover:shadow-xl'));
+
+      // 현재 클릭된 카드에 selected 클래스 추가
+      card.classList.add('selected', 'shadow-lg', 'hover:shadow-xl');
+
+      // 숨겨진 input 필드에 선택된 카테고리 값 업데이트
+      const selectedValue = card.getAttribute('data-value');
+      categoryInput.value = selectedValue;
+
+      // 시각적 강조를 위해 비선택된 카드의 그림자 클래스 조정
+      categoryCards.forEach(c => {
+        if (!c.classList.contains('selected')) {
+          c.classList.add('shadow-md');
+          c.classList.remove('shadow-lg', 'hover:shadow-xl');
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
