@@ -1,4 +1,4 @@
-package com.example.braincheck.Controller;
+package com.example.braincheck.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

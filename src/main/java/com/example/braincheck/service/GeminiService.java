@@ -1,4 +1,4 @@
-package com.example.braincheck.Service;
+package com.example.braincheck.service;
 
 import com.google.api.client.util.Value;
 import org.springframework.stereotype.Service;

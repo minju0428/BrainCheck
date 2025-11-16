@@ -1,13 +1,9 @@
-package com.example.braincheck.Controller;
+package com.example.braincheck.controller;
 //GeminiService.java 파일에 변수를 넘겨준 후 다시 받은 그 변수에 대한 유효성 검사는 하는 파일
 
-import com.example.braincheck.Service.GeminiService;
+import com.example.braincheck.service.GeminiService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
