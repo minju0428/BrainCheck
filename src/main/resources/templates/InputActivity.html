@@ -39,7 +39,7 @@
 
 <div class="max-w-xl w-full space-y-8">
 
-  <div class="max-w-xl w-full bg-white p-6 md:p-10 rounded-xl shadow-2xl space-y-8">
+  <form action="/character/submit" method="POST" class="max-w-xl w-full bg-white p-6 md:p-10 rounded-xl shadow-2xl space-y-8">
 
     <div>
       <label for="characterName" class="block text-gray-700 font-semibold mb-2">
@@ -82,11 +82,10 @@
     </div>
 
 
-    <button class="btn-gradient w-full text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition duration-150 flex items-center justify-center text-lg">
+    <button type="submit" class="btn-gradient w-full text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition duration-150 flex items-center justify-center text-lg">
       다음 단계로 <i data-lucide="arrow-right" class="ml-2 w-6 h-6"></i>
     </button>
-  </div>
-
+  </form>
   <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-300">
     <h2 class="text-lg font-bold text-purple-700 flex items-center mb-4">
       <i data-lucide="lightbulb" class="w-5 h-5 mr-2 text-yellow-500 fill-yellow-200"></i> 입력 팁
