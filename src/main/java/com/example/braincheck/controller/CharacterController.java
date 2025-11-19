@@ -75,8 +75,40 @@ public class CharacterController {
                //AI 답변 파싱
                Map<String, String> validationMap = parseAiValidationResult(aiValidationResult);
 
+               //파싱된 맵에서 '존재 여부' 값 추출
+               String existence = validationMap.get("존재 여부");
+
                //AI 검증 결과를 분석하여 추가 로직 수행
-               redirectAttributes.addFlashAttribute("validationMap", validationMap);
+               //검증에 성공한 경우
+               if("있음".equals(existence)){
+                   log.info("AI 검증 성공 :  존재 여부 = 있음. 다음 결과 페이지로 이동");
+
+
+                   redirectAttributes.addFlashAttribute("validationMap", validationMap);
+
+                   //이 변수들을 넘겨줄 다음 자바 파일 경로
+                   return "redirect:/character/result";
+               } else {
+                   //검증에 실패한 경우
+                   String generalErrorMessage = "입력하신 정보 중 일부가 일치하지 않아 분석할 수 없습니다. 다시 확인해주세요.";
+
+                   //항목별 구체적인 에러 메시지
+                   if("없음".equals(validationMap.get("등장인물"))){
+                       //등장인물: 없음 인 경우
+                       // code, args(빈 배열), defaultMessage 순으로 인자를 맞춥니다.
+                       bindingResult.reject("validation.failure.character", new Object[0], "입력하신 등장인물 정보가 작품에 존재하지 않습니다.");
+                   }
+                   if("없음".equals(validationMap.get("등장인물"))){
+                       //제목: 없음 인 경우
+                       bindingResult.reject("validation.failure.title", new Object[0], "입력하신 작품 제목이 존재하지 않거나 카테고리와 일치하지 않습니다.");
+                   }
+
+                   log.warn("AI 검증 실패: 존재 여부='{}' (입력 정보: {} / {})", existence, characterForm.getTitle(), characterForm.getCharacterName());
+
+                   return "InputActivity";
+               }
+
+
 
            } catch(Exception e){
                System.err.println("--- AI 검증 중 심각한 오류 발생 ---");
@@ -89,7 +121,8 @@ public class CharacterController {
            }
 
            //이 변수들을 넘겨줄 자바 파일 경로 지정
-           return "redirect:/character/result";
+            //다음 컨트롤러 파일 생성시 그 코드에 맞게 적어야함.
+           //return "redirect:/character/result";
 
     }
 
