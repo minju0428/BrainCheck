@@ -3,6 +3,7 @@ package com.example.braincheck.controller;
 import com.example.braincheck.dto.CharacterFormDto;
 import com.example.braincheck.service.CharacterValidationService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 //MBTI 유형 선택하는 UI에 넘겨줄 값들
 //다음 ui, java로 값을 넘겨줄 수 있게 하는 코드
 
+@Slf4j
 //@controller : 해당 클래스가 웹 요청을 처리하는 컨트롤러 역할을 수행함을 Spring에게 알려주는 어노테이션
 @Controller
 @RequestMapping("/character")
@@ -92,13 +94,18 @@ public class CharacterController {
     }
 
     private Map<String, String> parseAiValidationResult(String aiValidationResultRaw) {
+        //원본 데이터 로그
+        log.info("--- AI 원본 응답 파싱 시작 ---");
+        log.debug("원본 문자열:\n{}", aiValidationResultRaw);
+
         //초기 유효성 검사 및  방어 코드
         //입력된 문자열이 없을 경우 즉시 봔환
         //오류를 방지하는 안정 장치
         if(aiValidationResultRaw == null || aiValidationResultRaw.isEmpty()) {
+            log.warn("AI 응답 문자열이 null이거나 비어 있습니다. 빈 맵 반환.");
             return new HashMap<>();
         }
-        return Arrays.stream(aiValidationResultRaw.split("\n")) //줄바꿈을 기준으로 배열을 만듦.
+        Map<String, String> resultMap = Arrays.stream(aiValidationResultRaw.split("\n")) //줄바꿈을 기준으로 배열을 만듦.
                 .filter(line -> line.contains(":")) //line을 검사해서 ":"을 포함하는 줄만 남김.
                 .map(line -> {
                     String[] split = line.split(":", 2); //":"을 기준으로 최대 2개로 분리함.
@@ -107,8 +114,13 @@ public class CharacterController {
                     if (split.length == 2) { //분리가 된 요소가 2개인지 확인
                         String key = split[0].trim();   //키의 공백 제거
                         String value = split[1].trim(); //값의 공백 제거
+
+                        //파싱 항목 로그
+                        log.trace("파싱된 항목: Key='{}', Value='{}'", key, value);
+
                         return new AbstractMap.SimpleEntry<>(key, value); //키와 값으로 Map Entry 생성 및 반환
                     }
+                    log.trace("':'을 포함하지만 유효한 형식(키:값)이 아닌 라인 스킵: {}", line);
                     return null; //분리가 실패했거나 형식이 잘못된 경우 null 반환
                 })
                 //entry : 스트림에서 현재 처리 중인 Map.Entry객체(키-값)
@@ -127,6 +139,13 @@ public class CharacterController {
                         (existing, replacement)-> replacement,
                         HashMap::new
                 ));
+        //파싱 결과 로그
+        log.info("--- AI 파싱 결과 완료 ({}개 항목) ---", resultMap.size());
+        log.debug("최종 파싱된 Map: {}", resultMap);
+
+        // 👇 resultMap을 반환합니다.
+        return resultMap;
+
 
 
     }
