@@ -2,13 +2,19 @@ package com.example.braincheck.dto;
 //사용자가 고른 엠비티아이 저장하는 틀 코드
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor //기본 생성자를 자동으로 생성하는 어노테이션
 public class PredictionDto {
 
     //필드 선언
+    @NotNull(message = "에너지 방향은 필수 항목입니다.")
     private String ei;
+    @NotNull(message = "인식 기능은 필수 항목입니다.")
     private String sn;
+    @NotNull(message = "판단은 필수 항목입니다.")
     private String tf;
+    @NotNull(message = "생활 양식은 필수 항목입니다.")
     private String jp;
 
 
