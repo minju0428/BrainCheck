@@ -85,11 +85,19 @@ public class CharacterValidationService {
 
                              // 출력 형식 요청
                              + "아래 형식 외의 어떠한 설명이나 부가적인 내용도 포함하지 말고 오직 이 형식대로만 답하십시오:\n"
-                             + "등장인물:\n"
-                             + "제목:\n"
-                             + "카테고리:\n"
+
+                             +"등장인물: %s\n"
+                             + "제목: %s\n"
+                             + "카테고리: %s\n"
+
+                             +"등장인물 여부:\n"
+                             + "제목 여부:\n"
+                             + "카테고리 여부:\n"
                              + "존재 여부:\n",
 
+                     characterName,
+                     title,
+                     category,
                      characterName,
                      title,
                      category
@@ -107,7 +115,7 @@ public class CharacterValidationService {
              // 답변 처리
              String aiResponseText = ResponseHandler.getText(response);
 
-             // ⭐️ 여기에 콘솔 로그 추가
+             //콘솔 로그 추가
              System.out.println("--- Gemini AI 응답 시작 ---");
              System.out.println("입력된 프롬프트: \n" + prompt); // 프롬프트도 함께 출력하면 디버깅에 유용합니다.
              System.out.println("AI 답변 내용: \n" + aiResponseText);
