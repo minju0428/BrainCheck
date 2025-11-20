@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI 예측하기 - 결과 전송 기능 추가 (경고창 제거)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 커스텀 Tailwind 설정 및 그라데이션 정의 */
+        :root {
+            --primary-purple: #a238ff;
+            --secondary-pink: #ff3ca6;
+            /* 배경 그라데이션 */
+            --bg-gradient: radial-gradient(circle at top left, #e0f2fe 0%, #f3e8ff 50%, #ffffff 100%);
+
+            /* 버튼 그라데이션 정의 */
+            --button-gradient-base: linear-gradient(90deg, #b862ff, #ff71c6); /* 연한 보라/핑크 그라데이션 */
+            --button-gradient-hover: linear-gradient(90deg, #a238ff, #ff3ca6); /* 진한 보라/핑크 (호버/클릭 시 색상) */
+        }
+
+        /* 폰트 및 배경 그라데이션 설정 */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+        }
+
+        /* 각 MBTI 축 그룹 컨테이너 스타일 */
+        .choice-group {
+            background-color: #f9f6ff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ede9fe;
+            margin-bottom: 24px;
+        }
+
+        /* 선택지 카드 스타일 */
+        .choice-card {
+            min-height: 100px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            position: relative;
+            padding: 0;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        /* 선택된 카드 외곽 스타일 (두꺼운 보라색 테두리) */
+        .choice-card.selected {
+            border: 2px solid var(--primary-purple);
+            box-shadow: 0 4px 15px rgba(162, 56, 255, 0.2);
+        }
+
+        /* 카드 내부 콘텐츠 스타일 */
+        .choice-card .content {
+            padding: 1rem;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+            border-radius: 10px;
+        }
+
+        /* 체크 아이콘 스타일 */
+        .check-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: var(--primary-purple);
+            z-index: 10;
+        }
+        .choice-card:not(.selected) .check-icon {
+            display: none;
+        }
+
+        /* 섹션 제목 보조선 스타일 */
+        .section-title-accent {
+            position: relative;
+            display: block;
+            width: 100%;
+            margin-bottom: 30px;
+            padding-bottom: 8px;
+            box-sizing: border-box;
+        }
+        .section-title-accent h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .section-title-accent::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--primary-purple), #ff84e8);
+        }
+
+        /* 각 MBTI 축 제목의 보조선 스타일 */
+        .axis-title-accent {
+            position: relative;
+            margin-bottom: 20px; /* 제목과 아래 카드 그룹 사이 간격 */
+            padding-bottom: 8px; /* 텍스트와 선 사이의 간격 */
+            text-align: center; /* 텍스트를 중앙 정렬 */
+            box-sizing: border-box;
+        }
+        .axis-title-accent::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            width: 80%; /* 선의 너비 */
+            max-width: 150px; /* 최대 너비 제한 */
+            height: 3px;
+            border-radius: 1.5px;
+            background: linear-gradient(90deg, var(--primary-purple), #ff84e8);
+        }
+
+        /* 버튼 기본 스타일 (텍스트 및 아이콘 포함) */
+        #predict-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: background-image 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* 비활성화 상태 (연한 그라데이션 배경, 텍스트와 아이콘 연하게 표시) */
+        #predict-button:disabled {
+            background-image: var(--button-gradient-base);
+            color: white;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* 활성화 상태 (연한 그라데이션 배경, 텍스트와 아이콘 선명하게 표시) */
+        #predict-button:not(:disabled) {
+            background-image: var(--button-gradient-base);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(162, 56, 255, 0.4);
+        }
+
+        /* 활성화 상태에서 마우스 오버 시 (진한 그라데이션) */
+        #predict-button:not(:disabled):hover {
+            background-image: var(--button-gradient-hover);
+        }
+
+        /* 비활성화 상태에서는 텍스트와 아이콘을 연하게 (흐리게) 처리 */
+        #predict-button:disabled #button-text,
+        #predict-button:disabled #button-icon {
+            opacity: 0.5;
+        }
+
+        /* 활성화 상태에서는 텍스트와 아이콘을 선명하게 */
+        #predict-button:not(:disabled) #button-text,
+        #predict-button:not(:disabled) #button-icon {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="flex justify-center py-8 px-4">
+
+<div class="max-w-xl w-full text-left space-y-6">
+
+    <div class="flex items-center space-x-2 text-gray-500 hover:text-gray-700 cursor-pointer w-fit mb-4">
+        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+        <span class="font-medium">뒤로 가기</span>
+    </div>
+
+    <div class="space-y-6 pt-0">
+
+        <div class="section-title-accent mb-6">
+            <h2 class="text-xl font-bold text-gray-800">내가 생각하는 캐릭터의 MBTI 유형을 선택하세요</h2>
+        </div>
+
+        <div class="choice-group" data-axis="ei">
+            <p class="text-base font-semibold text-gray-800 axis-title-accent">에너지 방향</p>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="choice-card" data-value="E">
+                    <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
+                    <div class="content">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">E (외향)</h3>
+                        <p class="text-sm text-gray-600">외부 세계에서 에너지 얻음</p>
+                    </div>
+                </div>
+                <div class="choice-card" data-value="I">
+                    <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
+                    <div class="content">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">I (내향)</h3>
+                        <p class="text-sm text-gray-600">내면 세계에서 에너지 얻음</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="choice-group" data-axis="sn">
+            <p class="text-base font-semibold text-gray-800 axis-title-accent">인식 기능</p>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="choice-card" data-value="S">
+                    <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
+                    <div class="content">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">S (감각)</h3>
+                        <p class="text-sm text-gray-600">현실적이고 구체적 정보 선호</p>
+                    </div>
+                </div>
+                <div class="choice-card" data-value="N">
+                    <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
+                    <div class="content">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">N (직관)</h3>
+                        <p class="text-sm text-gray-600">추상적이고 가능성 중시</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="choice-group" data-axis="tf">
+            <p class="text-base font-semibold text-gray-800 axis-title-accent">판단 기능</p>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="choice-card" data-value="T">
+                    <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
+                    <div class="content">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">T (사고)</h3>
+                        <p class="text-sm text-gray-600">논리와 객관성 중시</p>
+                    </div>
+                </div>
+                <div class="choice-card" data-value="F">
+                    <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
+                    <div class="content">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">F (감정)</h3>
+                        <p class="text-sm text-gray-600">가치와 조화 중시</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="choice-group" data-axis="jp">
+            <p class="text-base font-semibold text-gray-800 axis-title-accent">생활 양식</p>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="choice-card" data-value="J">
+                    <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
+                    <div class="content">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">J (판단)</h3>
+                        <p class="text-sm text-gray-600">계획적이고 체계적</p>
+                    </div>
+                </div>
+                <div class="choice-card" data-value="P">
+                    <div class="check-icon"><i data-lucide="check-circle" class="w-5 h-5 fill-white"></i></div>
+                    <div class="content">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">P (인식)</h3>
+                        <p class="text-sm text-gray-600">유연하고 즉흥적</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-3">
+            <button id="predict-button" class="w-full font-bold py-3 rounded-full shadow-lg text-lg" disabled>
+                <span id="button-text">AI 분석 결과 확인하기</span>
+                <i id="button-icon" data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // Lucide Icons 초기화 (아이콘 렌더링)
+    lucide.createIcons();
+
+    // 선택 로직 구현
+    const choiceCards = document.querySelectorAll('.choice-card');
+    const predictButton = document.getElementById('predict-button');
+    const selectedValues = {};
+    const axes = ['ei', 'sn', 'tf', 'jp']; // 4가지 축
+
+    // ⭐ 스프링 부트 컨트롤러의 POST 요청 URL로 변경하세요.
+    const API_ENDPOINT = '/api/mbti/submit';
+
+    // 버튼 활성화/비활성화 함수
+    function updateButtonState() {
+        let allSelected = true;
+        axes.forEach(axis => {
+            if (!selectedValues[axis]) {
+                allSelected = false;
+            }
+        });
+
+        predictButton.disabled = !allSelected; // 4가지 모두 선택되어야 버튼 활성화
+    }
+
+    choiceCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const group = card.closest('.choice-group');
+            const axis = group.getAttribute('data-axis');
+            const value = card.getAttribute('data-value');
+
+            // 1. 같은 그룹 내의 모든 선택 해제
+            const siblings = group.querySelectorAll('.choice-card');
+            siblings.forEach(sibling => {
+                sibling.classList.remove('selected');
+            });
+
+            // 2. 현재 카드 선택 및 값 저장
+            card.classList.add('selected');
+            selectedValues[axis] = value;
+
+            // 3. 버튼 상태 업데이트
+            updateButtonState();
+        });
+    });
+
+    // ⭐ 결과 확인 버튼 클릭 이벤트 리스너: 백엔드로 데이터 전송
+    predictButton.addEventListener('click', async () => {
+        if (predictButton.disabled) {
+            return;
+        }
+
+        // MBTI 문자열 생성 (로그에 사용)
+        const mbtiResult = selectedValues['ei'] + selectedValues['sn'] + selectedValues['tf'] + selectedValues['jp'];
+
+        // 개별 필드(ei, sn, tf, jp)로 JSON 데이터 구조 정의
+        const payload = {
+            ei: selectedValues['ei'],
+            sn: selectedValues['sn'],
+            tf: selectedValues['tf'],
+            jp: selectedValues['jp'],
+        };
+
+        // 사용자에게 전송 시작 알림을 콘솔 로그로 대체
+        console.log(`[START] MBTI 유형 (${mbtiResult})의 개별 축 정보를 서버로 전송합니다.`);
+
+        try {
+            // Fetch API를 사용하여 HTTP POST 요청 전송
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            // 응답 처리
+            if (response.ok) {
+                const result = await response.json();
+                console.log('✅ [SUCCESS] MBTI 데이터 전송 성공. 서버 응답:', result);
+
+                // 성공 후 다음 페이지로 이동하는 로직을 여기에 추가합니다.
+                // const nextPageUrl = `/mbti-result?ei=${result.ei}&sn=${result.sn}&tf=${result.tf}&jp=${result.jp}`;
+                // window.location.href = nextPageUrl;
+
+            } else {
+                console.error('❌ [ERROR] MBTI 분석 결과 전송 실패 (HTTP Error):', response.status, response.statusText);
+                // 서버 오류 발생 시에도 경고창 대신 콘솔에만 기록
+                console.error(`❌ 데이터 전송 실패! 상태 코드: ${response.status}. 서버 주소와 컨트롤러를 확인하세요.`);
+            }
+        } catch (error) {
+            // 네트워크 오류 또는 기타 예외
+            console.error('🚨 [NETWORK ERROR] Fetch 요청 중 오류 발생:', error);
+            // 네트워크 오류 시에도 경고창 대신 콘솔에만 기록
+            console.error('🚨 네트워크 오류가 발생했습니다. 서버 연결 상태를 확인해 주세요.');
+        }
+    });
+
+    // 초기 버튼 상태 업데이트
+    updateButtonState();
+</script>
+</body>
+</html>
