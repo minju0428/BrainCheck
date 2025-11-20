@@ -75,8 +75,9 @@ public class CharacterController {
                //AI 답변 파싱
                Map<String, String> validationMap = parseAiValidationResult(aiValidationResult);
 
-               //파싱된 맵에서 '존재 여부' 값 추출
+               //파싱된 맵에서 '존재 여부' 'AiThing' 값 추출
                String existence = validationMap.get("존재 여부");
+               String aiThingMbti = validationMap.get("AiThing");
 
                //AI 검증 결과를 분석하여 추가 로직 수행
                //검증에 성공한 경우
@@ -88,6 +89,7 @@ public class CharacterController {
                    dataToPass.put("제목", characterForm.getTitle());
                    dataToPass.put("등장인물", characterForm.getCharacterName());
                    dataToPass.put("카테고리", characterForm.getCategory());
+                   dataToPass.put("AiThing", aiThingMbti);
 
                    redirectAttributes.addFlashAttribute("validationMap",dataToPass);
 

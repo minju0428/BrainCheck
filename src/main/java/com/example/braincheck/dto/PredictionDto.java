@@ -9,12 +9,14 @@ import lombok.NoArgsConstructor;
 public class PredictionDto {
 
     //전달받은 필드 선언
-    @NotBlank(message = "등장인물 이름은 필수 입력 항목입니다.")
+    @NotBlank(message = "선택한 등장인물")
     private String characterName;
-    @NotBlank(message = "제목은 필수 입력 항목입니다.")
+    @NotBlank(message = "선택한 제목")
     private String title;
-    @NotBlank(message = "카테고리를 선택해 주세요.")
+    @NotBlank(message = "선택한 카테고리")
     private String category;
+    @NotBlank(message = "ai가 생각하는 MBTI")
+    private String aiThing;
 
     //필드 선언
     @NotNull(message = "에너지 방향은 필수 항목입니다.")
@@ -42,6 +44,10 @@ public class PredictionDto {
     public String getCategory() {
 
         return category;
+    }
+
+    public String getAiThing() {
+        return aiThing;
     }
 
     public String getEi() {
@@ -74,6 +80,10 @@ public class PredictionDto {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public void setAiThing(String aiThing) {
+        this.aiThing = aiThing;
     }
 
     public void setEi(String ei) {
