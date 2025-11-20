@@ -65,6 +65,14 @@ public class PredictionController {
                                    Model model) { //html로 데이터 전달을 하기 위한 객체 생성
         String fullMbti = ei + sn +tf + jp;
 
+        // 리다이렉션 후 수신된 데이터 확인
+        System.out.println("=== 쿼리 파라미터 수신 데이터 확인 (userSelectedMbti) ===");
+        System.out.println("E/I (ei): " + ei);
+        System.out.println("S/N (sn): " + sn);
+        System.out.println("T/F (tf): " + tf);
+        System.out.println("J/P (jp): " + jp);
+        System.out.println("최종 MBTI: " + fullMbti);
+
         model.addAttribute("fullMbti", fullMbti);
         model.addAttribute("ei", ei);
         model.addAttribute("sn", sn);
