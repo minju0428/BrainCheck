@@ -73,30 +73,27 @@
             font-weight: 600;
         }
 
-        /* 차원 비교 카드 스타일 (생략) */
+        /* 차원 비교 카드 스타일 */
         .dimension-card {
             padding: 1.25rem;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
             gap: 0.75rem;
         }
-        .dimension-card > div:not(:first-child) {
-            align-self: center;
-        }
 
-        /* 차원 아이콘 원형 스타일 (생략) */
+        /* 차원 아이콘 원형 스타일 [수정] */
         .dimension-icon {
-            width: 2.5rem;
-            height: 2.5rem;
+            width: 2rem; /* 2.5rem -> 2rem으로 축소 */
+            height: 2rem; /* 2.5rem -> 2rem으로 축소 */
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 1.125rem;
+            font-size: 1rem; /* 1.125rem -> 1rem으로 축소 */
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
@@ -219,7 +216,7 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div class="dimension-card bg-orange-50">
             <p class="text-sm font-bold text-gray-800 text-left w-full">에너지 방향</p>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center justify-center gap-2">
                 <div class="dimension-icon bg-purple-500 text-white">E</div>
                 <div class="dimension-icon bg-red-500 text-white">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -231,7 +228,7 @@
 
         <div class="dimension-card bg-orange-50">
             <p class="text-sm font-bold text-gray-800 text-left w-full">인식 기능</p>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center justify-center gap-2">
                 <div class="dimension-icon bg-purple-500 text-white">N</div>
                 <div class="dimension-icon bg-red-500 text-white">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -243,7 +240,7 @@
 
         <div class="dimension-card bg-green-50">
             <p class="text-sm font-bold text-gray-800 text-left w-full">판단 기능</p>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center justify-center gap-2">
                 <div class="dimension-icon bg-green-500 text-white">T</div>
                 <div class="dimension-icon bg-green-500 text-white">
                     <i data-lucide="check" class="w-5 h-5"></i>
@@ -255,7 +252,7 @@
 
         <div class="dimension-card bg-green-50">
             <p class="text-sm font-bold text-gray-800 text-left w-full">생활 양식</p>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center justify-center gap-2">
                 <div class="dimension-icon bg-green-500 text-white">J</div>
                 <div class="dimension-icon bg-green-500 text-white">
                     <i data-lucide="check" class="w-5 h-5"></i>
@@ -265,7 +262,6 @@
             <span class="text-sm font-semibold text-green-600">일치</span>
         </div>
     </div>
-
     <div class="bg-white p-5 rounded-xl shadow-lg">
         <h3 class="text-base font-bold text-gray-800 mb-4">설득 대상 차원</h3>
         <div class="flex flex-wrap gap-3">
