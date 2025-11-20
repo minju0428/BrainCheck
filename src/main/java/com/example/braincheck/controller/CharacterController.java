@@ -41,7 +41,7 @@ public class CharacterController {
     @GetMapping("/input")
     public String showInput(Model model) {
         //사용자 입력을 받을 '데이터 그릇' 생성
-        model.addAttribute("characterForm", new CharacterFormDto());
+        model.addAttribute("characterFormDto", new CharacterFormDto());
         //입력 화면 반환
         return "InputActivity";
     }
@@ -50,7 +50,7 @@ public class CharacterController {
     public String submitForm(
             //@Valid : 유효성 검사 실행
             //@ModelAttribute : 데이터 바이딩(매핑) 및 모델 추가
-            @Valid @ModelAttribute("characterForm") CharacterFormDto characterForm,
+            @Valid @ModelAttribute("CharacterFormDto") CharacterFormDto characterForm,
 
             //BindingResult : 스프링 프레임워크에 내장되어있는 인터페이스
             // 오류 발생 시 사용자가 제출했던 폼 화면으로 돌아갈 수 있게 해주는 인터페이스
@@ -83,27 +83,33 @@ public class CharacterController {
                if("있음".equals(existence)){
                    log.info("AI 검증 성공 :  존재 여부 = 있음. 다음 결과 페이지로 이동");
 
+                   Map<String, String> dataToPass = new HashMap<>();
 
-                   redirectAttributes.addFlashAttribute("validationMap", validationMap);
+                   dataToPass.put("제목", characterForm.getTitle());
+                   dataToPass.put("등장인물", characterForm.getCharacterName());
+                   dataToPass.put("카테고리", characterForm.getCategory());
 
+                   redirectAttributes.addFlashAttribute("validationMap",dataToPass);
+
+                   log.info("Flash Attribute로 전달되는 데이터: {}", dataToPass);
                    //이 변수들을 넘겨줄 다음 자바 파일 경로
-                   return "redirect:/character/result";
+                   return "redirect:/mbti-ui";
                } else {
                    //검증에 실패한 경우
                    String generalErrorMessage = "입력하신 정보 중 일부가 일치하지 않아 분석할 수 없습니다. 다시 확인해주세요.";
 
                    //항목별 구체적인 에러 메시지
-                   if("없음".equals(validationMap.get("등장인물"))){
+                   if("없음".equals(validationMap.get("등장인물 여부"))){
                        //등장인물: 없음 인 경우
                        // code, args(빈 배열), defaultMessage 순으로 인자를 맞춥니다.
                        bindingResult.reject("validation.failure.character", new Object[0], "입력하신 등장인물 정보가 작품에 존재하지 않습니다.");
                    }
-                   if("없음".equals(validationMap.get("등장인물"))){
+                   if("없음".equals(validationMap.get("제목 여부"))){
                        //제목: 없음 인 경우
                        bindingResult.reject("validation.failure.title", new Object[0], "입력하신 작품 제목이 존재하지 않거나 카테고리와 일치하지 않습니다.");
                    }
 
-                   log.warn("AI 검증 실패: 존재 여부='{}' (입력 정보: {} / {})", existence, characterForm.getTitle(), characterForm.getCharacterName());
+                   log.info("AI 검증 실패: 존재 여부='{}' (입력 정보: {} / {})", existence, characterForm.getTitle(), characterForm.getCharacterName());
 
                    return "InputActivity";
                }
@@ -120,9 +126,7 @@ public class CharacterController {
                return "InputActivity";
            }
 
-           //이 변수들을 넘겨줄 자바 파일 경로 지정
-            //다음 컨트롤러 파일 생성시 그 코드에 맞게 적어야함.
-           //return "redirect:/character/result";
+
 
     }
 
