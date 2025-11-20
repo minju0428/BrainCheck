@@ -52,6 +52,7 @@ public class PredictionController {
         String title = predictionDto.getTitle();
         String characterName = predictionDto.getCharacterName();
         String category = predictionDto.getCategory();
+        String aiThing = predictionDto.getAiThing();
 
         String ei = predictionDto.getEi();
         String sn = predictionDto.getSn();
@@ -66,6 +67,7 @@ public class PredictionController {
         System.out.println("제목: " + title);
         System.out.println("등장인물: " + characterName);
         System.out.println("카테고리: " + category);
+        System.out.println("AiThing: " + aiThing);
         System.out.println("E/I (ei): " + ei);
         System.out.println("S/N (sn): " + sn);
         System.out.println("T/F (tf): " + tf);
@@ -97,6 +99,7 @@ public class PredictionController {
                                    @RequestParam("title") String title,
                                    @RequestParam("characterName") String characterName,
                                    @RequestParam("category") String category,
+                                   @RequestParam("aiThing")  String aiThing,
                                    Model model) { //html로 데이터 전달을 하기 위한 객체 생성
         String fullMbti = ei + sn +tf + jp;
 
@@ -105,6 +108,7 @@ public class PredictionController {
         System.out.println("제목 (수신): " + title);
         System.out.println("등장인물 (수신): " + characterName);
         System.out.println("카테고리 (수신): " + category);
+        System.out.println("AiThing (수신): " + aiThing);
         System.out.println("E/I (ei): " + ei);
         System.out.println("S/N (sn): " + sn);
         System.out.println("T/F (tf): " + tf);
@@ -114,6 +118,7 @@ public class PredictionController {
         model.addAttribute("title", title);
         model.addAttribute("characterName", characterName);
         model.addAttribute("category", category);
+        model.addAttribute("aiThing", aiThing);
         model.addAttribute("fullMbti", fullMbti);
         model.addAttribute("ei", ei);
         model.addAttribute("sn", sn);
