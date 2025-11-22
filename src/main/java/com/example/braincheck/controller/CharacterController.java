@@ -79,6 +79,32 @@ public class CharacterController {
                String existence = validationMap.get("존재 여부");
                String aiThingMbti = validationMap.get("AiThing");
 
+               //파싱된 AI가 도출한 MBTI 각각 퍼센트 값 추출
+               String valueEStr = validationMap.get("ValueE");
+               String valueE = valueEStr.replace("%", "").trim();
+
+               String valueIStr = validationMap.get("ValueI");
+               String valueI = valueIStr.replace("%", "").trim();
+
+               String valueSStr = validationMap.get("ValueS");
+               String valueS = valueSStr.replace("%", "").trim();
+
+               String valueNStr = validationMap.get("ValueN");
+               String valueN = valueNStr.replace("%", "").trim();
+
+               String valueTStr = validationMap.get("ValueT");
+               String valueT = valueTStr.replace("%", "").trim();
+
+               String valueFStr = validationMap.get("ValueF");
+               String valueF = valueFStr.replace("%", "").trim();
+
+               String valueJStr = validationMap.get("ValueJ");
+               String valueJ = valueJStr.replace("%", "").trim();
+
+               String valuePStr = validationMap.get("ValueP");
+               String valueP = valuePStr.replace("%", "").trim();
+
+
                //AI 검증 결과를 분석하여 추가 로직 수행
                //검증에 성공한 경우
                if("있음".equals(existence)){
@@ -90,6 +116,14 @@ public class CharacterController {
                    dataToPass.put("등장인물", characterForm.getCharacterName());
                    dataToPass.put("카테고리", characterForm.getCategory());
                    dataToPass.put("AiThing", aiThingMbti);
+                   dataToPass.put("valueE", valueE);
+                   dataToPass.put("valueI", valueI);
+                   dataToPass.put("valueS", valueS);
+                   dataToPass.put("valueN", valueN);
+                   dataToPass.put("valueT", valueT);
+                   dataToPass.put("valueF", valueF);
+                   dataToPass.put("valueJ", valueJ);
+                   dataToPass.put("valueP", valueP);
 
                    redirectAttributes.addFlashAttribute("validationMap",dataToPass);
 

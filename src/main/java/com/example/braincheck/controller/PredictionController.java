@@ -28,6 +28,18 @@ public class PredictionController {
             model.addAttribute("title", validationMap.get("제목"));
             model.addAttribute("characterName", validationMap.get("등장인물"));
             model.addAttribute("category", validationMap.get("카테고리"));
+
+            model.addAttribute("aiThing", validationMap.get("AiThing"));
+            model.addAttribute("valueE", validationMap.get("valueE"));
+            model.addAttribute("valueI", validationMap.get("valueI"));
+            model.addAttribute("valueS", validationMap.get("valueS"));
+            model.addAttribute("valueN", validationMap.get("valueN"));
+            model.addAttribute("valueT", validationMap.get("valueT"));
+            model.addAttribute("valueF", validationMap.get("valueF"));
+            model.addAttribute("valueJ", validationMap.get("valueJ"));
+            model.addAttribute("valueP", validationMap.get("valueP"));
+
+
         } else {
             log.warn("Flash Attribute 'validationMap'을 찾을 수 없습니다. (직접 URL 접근 등의 경우)");
         }
@@ -53,6 +65,14 @@ public class PredictionController {
         String characterName = predictionDto.getCharacterName();
         String category = predictionDto.getCategory();
         String aiThing = predictionDto.getAiThing();
+        String valueE = predictionDto.getValueE();
+        String valueI = predictionDto.getValueI();
+        String valueS = predictionDto.getValueS();
+        String valueN = predictionDto.getValueN();
+        String valueT = predictionDto.getValueT();
+        String valueF = predictionDto.getValueF();
+        String valueJ = predictionDto.getValueJ();
+        String valueP = predictionDto.getValueP();
 
         String ei = predictionDto.getEi();
         String sn = predictionDto.getSn();
@@ -68,19 +88,38 @@ public class PredictionController {
         System.out.println("등장인물: " + characterName);
         System.out.println("카테고리: " + category);
         System.out.println("AiThing: " + aiThing);
+        System.out.println("ValueE (외향): " + valueE);
+        System.out.println("ValueI (내향): " + valueI);
+        System.out.println("ValueS (감각): " + valueS);
+        System.out.println("ValueN (직관): " + valueN);
+        System.out.println("ValueT (사고): " + valueT);
+        System.out.println("ValueF (감정): " + valueF);
+        System.out.println("ValueJ (판단): " + valueJ);
+        System.out.println("ValueP (인식): " + valueP);
         System.out.println("E/I (ei): " + ei);
         System.out.println("S/N (sn): " + sn);
         System.out.println("T/F (tf): " + tf);
         System.out.println("J/P (jp): " + jp);
         System.out.println("선택한 MBTI: " + fullMbti);
 
-        String nextUrl = String.format("/user-selected-mbti?ei=%s&sn=%s&tf=%s&jp=%s&title=%s&characterName=%s&category=%s",
+        String nextUrl = String.format("/user-selected-mbti?ei=%s&sn=%s&tf=%s&jp=%s&title=%s&characterName=%s&category=%s&aiThing=%s&valueE=%s&valueI=%s&valueS=%s&valueN=%s&valueT=%s&valueF=%s&valueJ=%s&valueP=%s",
                 ei, sn, tf, jp,
-                title, characterName, category);
+                title, characterName, category,
+                aiThing,
+                valueE, valueI, valueS, valueN,
+                valueT, valueF, valueJ, valueP);
 
         // 클라이언트(JavaScript)에게 보낼 JSON 응답을 Map으로 만듭니다.
         Map<String, String> response = new HashMap<>();
         response.put("fullMbti", fullMbti);
+        response.put("valueE", valueE);
+        response.put("valueI", valueI);
+        response.put("valueS", valueS);
+        response.put("valueN", valueN);
+        response.put("valueT", valueT);
+        response.put("valueF", valueF);
+        response.put("valueJ", valueJ);
+        response.put("valueP", valueP);
         response.put("nextUrl", nextUrl); // 💡 클라이언트가 이동할 URL 정보 제공
 
         // Map을 JSON 형태로 반환
@@ -100,6 +139,14 @@ public class PredictionController {
                                    @RequestParam("characterName") String characterName,
                                    @RequestParam("category") String category,
                                    @RequestParam("aiThing")  String aiThing,
+                                   @RequestParam("valueE") String valueE,
+                                   @RequestParam("valueI") String valueI,
+                                   @RequestParam("valueS") String valueS,
+                                   @RequestParam("valueN") String valueN,
+                                   @RequestParam("valueT") String valueT,
+                                   @RequestParam("valueF") String valueF,
+                                   @RequestParam("valueJ") String valueJ,
+                                   @RequestParam("valueP") String valueP,
                                    Model model) { //html로 데이터 전달을 하기 위한 객체 생성
         String fullMbti = ei + sn +tf + jp;
 
@@ -108,7 +155,17 @@ public class PredictionController {
         System.out.println("제목 (수신): " + title);
         System.out.println("등장인물 (수신): " + characterName);
         System.out.println("카테고리 (수신): " + category);
+
         System.out.println("AiThing (수신): " + aiThing);
+        System.out.println("valueE : " + valueE);
+        System.out.println("valueI : " + valueI);
+        System.out.println("valueS : " + valueS);
+        System.out.println("valueN : " + valueN);
+        System.out.println("valueT : " + valueT);
+        System.out.println("valueF : " + valueF);
+        System.out.println("valueJ : " + valueJ);
+        System.out.println("valueP : " + valueP);
+
         System.out.println("E/I (ei): " + ei);
         System.out.println("S/N (sn): " + sn);
         System.out.println("T/F (tf): " + tf);
@@ -120,10 +177,19 @@ public class PredictionController {
         model.addAttribute("category", category);
         model.addAttribute("aiThing", aiThing);
         model.addAttribute("fullMbti", fullMbti);
+        model.addAttribute("valueE", valueE);
+        model.addAttribute("valueI", valueI);
+        model.addAttribute("valueS", valueS);
+        model.addAttribute("valueN", valueN);
+        model.addAttribute("valueT", valueT);
+        model.addAttribute("valueF", valueF);
+        model.addAttribute("valueJ", valueJ);
+        model.addAttribute("valueP", valueP);
         model.addAttribute("ei", ei);
         model.addAttribute("sn", sn);
         model.addAttribute("tf", tf);
         model.addAttribute("jp", jp);
+
 
         //다음 이동할 화면 이름을 적으면 됨.
         //다음 화면 구현시 바꾸기

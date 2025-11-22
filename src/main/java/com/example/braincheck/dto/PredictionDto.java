@@ -15,8 +15,34 @@ public class PredictionDto {
     private String title;
     @NotBlank(message = "선택한 카테고리")
     private String category;
+
+    //ai가 도출한 MBTI
     @NotBlank(message = "ai가 생각하는 MBTI")
     private String aiThing;
+    @NotBlank(message = "ai가 생각하는 E의 퍼센트")
+    private String valueE;
+
+    @NotBlank(message = "ai가 생각하는 I의 퍼센트")
+    private String valueI;
+
+    @NotBlank(message = "ai가 생각하는 S의 퍼센트")
+    private String valueS;
+
+    @NotBlank(message = "ai가 생각하는 N의 퍼센트")
+    private String valueN;
+
+    @NotBlank(message = "ai가 생각하는 T의 퍼센트")
+    private String valueT;
+
+    @NotBlank(message = "ai가 생각하는 F의 퍼센트")
+    private String valueF;
+
+    @NotBlank(message = "ai가 생각하는 J의 퍼센트")
+    private String valueJ;
+
+    @NotBlank(message = "ai가 생각하는 P의 퍼센트")
+    private String valueP;
+
 
     //필드 선언
     @NotNull(message = "에너지 방향은 필수 항목입니다.")
@@ -49,6 +75,39 @@ public class PredictionDto {
     public String getAiThing() {
         return aiThing;
     }
+
+    public String getValueE() {
+        return valueE;
+    }
+
+    public String getValueI() {
+        return valueI;
+    }
+
+    public String getValueS() {
+        return valueS;
+    }
+
+    public String getValueN() {
+        return valueN;
+    }
+
+    public String getValueT() {
+        return valueT;
+    }
+
+    public String getValueF() {
+        return valueF;
+    }
+
+    public String getValueJ() {
+        return valueJ;
+    }
+
+    public String getValueP() {
+        return valueP;
+    }
+
 
     public String getEi() {
         return ei;
@@ -85,6 +144,40 @@ public class PredictionDto {
     public void setAiThing(String aiThing) {
         this.aiThing = aiThing;
     }
+
+    public void setValueE(String valueE) {
+        this.valueE = valueE;
+    }
+
+    public void setValueI(String valueI) {
+        this.valueI = valueI;
+    }
+
+    public void setValueS(String valueS) {
+        this.valueS = valueS;
+    }
+
+    public void setValueN(String valueN) {
+        this.valueN = valueN;
+    }
+
+    public void setValueT(String valueT) {
+        this.valueT = valueT;
+    }
+
+    public void setValueF(String valueF) {
+        this.valueF = valueF;
+    }
+
+    public void setValueJ(String valueJ) {
+        this.valueJ = valueJ;
+    }
+
+    public void setValueP(String valueP) {
+        this.valueP = valueP;
+    }
+
+
 
     public void setEi(String ei) {
         this.ei = ei;

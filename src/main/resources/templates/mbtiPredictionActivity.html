@@ -162,6 +162,15 @@
     <input type="hidden" id="hiddenTitle" th:value="${title}" />
     <input type="hidden" id="hiddenCharacterName" th:value="${characterName}" />
     <input type="hidden" id="hiddenCategory" th:value="${category}" />
+    <input type="hidden" id="hiddenAiThing" th:value="${aiThing}" />
+    <input type="hidden" id="hiddenValueE" th:value="${valueE}" />
+    <input type="hidden" id="hiddenValueI" th:value="${valueI}" />
+    <input type="hidden" id="hiddenValueS" th:value="${valueS}" />
+    <input type="hidden" id="hiddenValueN" th:value="${valueN}" />
+    <input type="hidden" id="hiddenValueT" th:value="${valueT}" />
+    <input type="hidden" id="hiddenValueF" th:value="${valueF}" />
+    <input type="hidden" id="hiddenValueJ" th:value="${valueJ}" />
+    <input type="hidden" id="hiddenValueP" th:value="${valueP}" />
 
     <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 space-y-2 text-gray-700">
         <p class="font-bold text-lg text-indigo-700 flex items-center mb-3">
@@ -287,6 +296,16 @@
     const hiddenCharacterName = document.getElementById('hiddenCharacterName');
     const hiddenCategory = document.getElementById('hiddenCategory');
 
+    const hiddenAiThing = document.getElementById('hiddenAiThing');
+    const hiddenValueE = document.getElementById('hiddenValueE');
+    const hiddenValueI = document.getElementById('hiddenValueI');
+    const hiddenValueS = document.getElementById('hiddenValueS');
+    const hiddenValueN = document.getElementById('hiddenValueN');
+    const hiddenValueT = document.getElementById('hiddenValueT');
+    const hiddenValueF = document.getElementById('hiddenValueF');
+    const hiddenValueJ = document.getElementById('hiddenValueJ');
+    const hiddenValueP = document.getElementById('hiddenValueP');
+
     // 버튼 활성화/비활성화 함수
     function updateButtonState() {
         let allSelected = true;
@@ -338,6 +357,16 @@
             title: hiddenTitle ? hiddenTitle.value : '',
             characterName: hiddenCharacterName ? hiddenCharacterName.value : '',
             category: hiddenCategory ? hiddenCategory.value : '',
+
+            aiThing: hiddenAiThing ? hiddenAiThing.value : '',
+            valueE: hiddenValueE ? hiddenValueE.value : '',
+            valueI: hiddenValueI ? hiddenValueI.value : '',
+            valueS: hiddenValueS ? hiddenValueS.value : '',
+            valueN: hiddenValueN ? hiddenValueN.value : '',
+            valueT: hiddenValueT ? hiddenValueT.value : '',
+            valueF: hiddenValueF ? hiddenValueF.value : '',
+            valueJ: hiddenValueJ ? hiddenValueJ.value : '',
+            valueP: hiddenValueP ? hiddenValueP.value : '',
         };
 
         console.log(`[START] MBTI 유형 (${mbtiResult}) 및 캐릭터 정보를 서버로 전송합니다.`);

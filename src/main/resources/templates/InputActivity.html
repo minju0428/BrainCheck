@@ -31,11 +31,25 @@
 
 <div class="max-w-xl w-full space-y-8">
 
-  <!-- ★★★★★ form 시작 ★★★★★ -->
   <form th:action="@{/character/submit}" th:object="${characterFormDto}" method="post"
         class="max-w-xl w-full bg-white p-6 md:p-10 rounded-xl shadow-2xl space-y-8">
 
-    <!-- 등장인물 -->
+    <div style="display: none;">
+      <input type="hidden" id="hiddenTitle" th:value="${title}" />
+      <input type="hidden" id="hiddenCharacterName" th:value="${characterName}" />
+      <input type="hidden" id="hiddenCategory" th:value="${category}" />
+
+      <input type="hidden" id="hiddenValueE" th:value="${valueE}" />
+      <input type="hidden" id="hiddenValueI" th:value="${valueI}" />
+      <input type="hidden" id="hiddenValueS" th:value="${valueS}" />
+      <input type="hidden" id="hiddenValueN" th:value="${valueN}" />
+      <input type="hidden" id="hiddenValueT" th:value="${valueT}" />
+      <input type="hidden" id="hiddenValueF" th:value="${valueF}" />
+      <input type="hidden" id="hiddenValueP" th:value="${valueP}" />
+      <input type="hidden" id="hiddenValueJ" th:value="${valueJ}" />
+    </div>
+
+
     <div>
       <label class="block text-gray-700 font-semibold mb-2">
         등장인물 이름 <span class="text-red-500">*</span>
@@ -45,7 +59,6 @@
              placeholder="예: 해리 포터, 셜록 홈즈, 토니 스타크" required>
     </div>
 
-    <!-- 작품 제목 -->
     <div>
       <label class="block text-gray-700 font-semibold mb-2">
         작품 제목 <span class="text-red-500">*</span>
@@ -55,13 +68,11 @@
              placeholder="예: 해리 포터 시리즈, 셜록, 아이언맨" required>
     </div>
 
-    <!-- 카테고리 -->
     <div>
       <label class="block text-gray-700 font-semibold mb-4">
         카테고리 <span class="text-red-500">*</span>
       </label>
 
-      <!-- ★ category hidden input 유지 -->
       <input type="hidden" th:field="*{category}" id="category" value="movie" required>
 
       <div id="category-selection" class="grid grid-cols-3 gap-4">
@@ -87,7 +98,6 @@
       </div>
     </div>
 
-    <!-- ★ submit 버튼 (onclick 제거, POST로 제출) -->
     <button type="submit"
             class="btn-gradient w-full text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition duration-150 flex items-center justify-center text-lg">
       다음 단계로
@@ -95,9 +105,6 @@
     </button>
 
   </form>
-  <!-- ★★★★★ form 끝 ★★★★★ -->
-
-  <!-- 입력 팁 -->
   <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-300">
     <h2 class="text-lg font-bold text-purple-700 flex items-center mb-4">
       <i data-lucide="lightbulb" class="w-5 h-5 mr-2 text-yellow-500"></i> 입력 팁
@@ -110,7 +117,6 @@
     </ul>
   </div>
 
-  <!-- 입력 예시 -->
   <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-300 space-y-4">
     <h2 class="text-lg font-bold text-blue-700 flex items-center mb-4">
       <i data-lucide="book-open" class="w-5 h-5 mr-2 text-green-500"></i> 입력 예시
