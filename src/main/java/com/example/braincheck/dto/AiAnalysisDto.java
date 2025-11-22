@@ -1,5 +1,7 @@
 package com.example.braincheck.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor //기본 생성자를 자동으로 생성하는 어노테이션
@@ -28,6 +30,7 @@ public class AiAnalysisDto {
     @NotBlank(message = "ai가 생각하는 J/P 유형")
     private String aiJp;
 
+    //ai mbti 퍼센트
     @NotBlank(message = "ai가 생각하는 E의 퍼센트")
     private String valueE;
 

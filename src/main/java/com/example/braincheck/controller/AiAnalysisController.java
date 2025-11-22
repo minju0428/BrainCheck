@@ -56,7 +56,7 @@ public class AiAnalysisController {
         Map<String, String> dataForService = new HashMap<>();
         dataForService.put("aiThing", aiThing);
 
-        Map<String, String> processedAiData = aiAnalysisService.procoessForPersude(dataForService);
+        Map<String, String> processedAiData = aiAnalysisService.processForPersuade(dataForService);
 
         String fullAiMbti = processedAiData.get("aiEi") + processedAiData.get("aiSn") + processedAiData.get("aiTf") + processedAiData.get("aiJp");
 
@@ -113,7 +113,7 @@ public class AiAnalysisController {
         model.addAttribute("jp", jp);
 
 
-        return "AIAnalsisActivity";
+        return "AIAnalysisActivity";
     }
 
     @PostMapping("/transfer-to-persuade")
@@ -132,6 +132,10 @@ public class AiAnalysisController {
             @RequestParam("valueF") String valueF,
             @RequestParam("valueJ") String valueJ,
             @RequestParam("valueP") String valueP,
+            @RequestParam("ei") String ei,
+            @RequestParam("sn") String sn,
+            @RequestParam("tf") String tf,
+            @RequestParam("jp") String jp,
             // 다음 페이지로 데이터를 안전하게 전달하기 위한 객체
             RedirectAttributes redirectAttributes) {
 
@@ -152,10 +156,14 @@ public class AiAnalysisController {
         persuadeData.put("valueF", valueF);
         persuadeData.put("valueJ", valueJ);
         persuadeData.put("valueP", valueP);
+        persuadeData.put("ei", ei);
+        persuadeData.put("sn", sn);
+        persuadeData.put("tf", tf);
+        persuadeData.put("jp", jp);
 
 
         //service 계층 호출
-        Map<String, String> processedData = aiAnalysisService.procoessForPersude(persuadeData);
+        Map<String, String> processedData = aiAnalysisService.processForPersuade(persuadeData);
 
         // 데이터를 저장하여 리다이렉트 후에도 데이터가 유지되도록 함
         redirectAttributes.addFlashAttribute("persuadeData", persuadeData);
@@ -165,5 +173,6 @@ public class AiAnalysisController {
         // 설득 대결 시작 페이지로 리다이렉트 (예시 경로: /persuade/start)
         //다음 경로로 고치기
         //return "redirect:/persuade/start";
+        return  "redirect:/";
     }
 }

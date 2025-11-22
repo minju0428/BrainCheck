@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MBTI 분석 결과 상세</title>
+    <title th:text="${title} + ' MBTI 분석 결과 상세'">MBTI 분석 결과 상세</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* 기존 CSS 스타일 유지 */
@@ -11,9 +11,7 @@
             --primary-purple: #a238ff;
             --secondary-pink: #ff3ca6;
             --purple-light: #f3e8ff;
-            --blue-main: #3b82f6;
-
-            /* 배경 그라데이션 보라색 계열 */
+            --blue-main: #3b82f6; /* 바 차트 메인 색상 */
             --bg-gradient: radial-gradient(circle at top left, #e0f2fe 0%, #f3e8ff 50%, #ffffff 100%);
         }
 
@@ -28,73 +26,38 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
+        /*  */
+        /* === 분석 대상 정보 박스 스타일 === */
+        .info-box-header {
+            color: var(--primary-purple); /* 보라색 헤더 텍스트 */
+        }
+        .info-detail {
+            margin-left: 1.5rem; /* 들여쓰기 */
+        }
+        /* === End of Bar Chart Style === */
 
-        .bar-container {
-            display: flex;
-            align-items: center;
-            height: 25px;
-            border-radius: 9999px;
-            overflow: hidden;
-            background-color: var(--purple-light);
+        /* ... (나머지 스타일 코드는 생략) ... */
+        .bar-chart-item { margin-bottom: 1rem; }
+        .bar-container-new {
+            display: flex; height: 35px; border-radius: 9999px; overflow: hidden;
+            background-color: #e5e7eb; margin-top: 5px; position: relative;
         }
-
-        .bar-segment {
-            height: 100%;
-            background-color: var(--primary-purple);
-            transition: width 0.5s ease-in-out;
-            white-space: nowrap;
-            padding-left: 0.5rem;
-            display: flex;
-            align-items: center;
-            color: white;
-            font-size: 0.875rem;
-            font-weight: 600;
+        .bar-label-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 0.875rem; font-weight: 600; color: #1f2937;
         }
-
-        .bar-reverse-segment {
-            height: 100%;
-            transition: width 0.5s ease-in-out;
-            white-space: nowrap;
-            padding-right: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            color: var(--primary-purple);
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .dimension-card {
-            padding: 1.25rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .dimension-icon {
-            width: 2rem;
-            height: 2rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1rem;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .persuade-button {
-            background: linear-gradient(135deg, #ef4444, #f472b6);
-            transition: all 0.3s ease;
-        }
-        .persuade-button:hover {
-            background: linear-gradient(135deg, #dc2626, #ec4899);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-        }
+        .bar-segment-left { height: 100%; background-color: var(--blue-main); transition: width 0.5s ease-in-out; display: flex; align-items: center; justify-content: flex-end; }
+        .bar-segment-right { height: 100%; background-color: var(--blue-main); transition: width 0.5s ease-in-out; display: flex; align-items: center; justify-content: flex-start; }
+        .bar-text-label { width: 15%; font-size: 1rem; font-weight: 700; color: #1f2937; display: flex; align-items: center; }
+        .bar-text-label-left { justify-content: flex-start; }
+        .bar-text-label-right { justify-content: flex-end; }
+        .bar-wrapper { display: flex; align-items: center; gap: 0.5rem; }
+        .bar-icon { padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 1rem; font-weight: 700; color: white; background-color: var(--blue-main); }
+        .dimension-card { padding: 1.25rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+        .dimension-icon { width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); }
+        .persuade-button { background: linear-gradient(135deg, #ef4444, #f472b6); transition: all 0.3s ease; }
+        .persuade-button:hover { background: linear-gradient(135deg, #dc2626, #ec4899); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); }
     </style>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -107,8 +70,8 @@
         <input type="hidden" id="hiddenCharacterName" th:value="${characterName ?: ''}" />
         <input type="hidden" id="hiddenCategory" th:value="${category ?: ''}" />
 
-        <input type="hidden" id="hiddenPredictedMbti1" th:value="${fullMbti ?: ''}" />
-        <input type="hidden" id="hiddenPredictedMbti2" th:value="${aiThing ?: ''}" />
+        <input type="hidden" id="hiddenUserFullMbti" th:value="${ei + sn + tf + jp ?: ''}" />
+        <input type="hidden" id="hiddenAiFullMbti" th:value="${fullAiMbti ?: ''}" />
 
         <input type="hidden" id="hiddenValueE" th:value="${valueE ?: '0'}" />
         <input type="hidden" id="hiddenValueI" th:value="${valueI ?: '0'}" />
@@ -128,94 +91,45 @@
         <input type="hidden" id="hiddenUserSn" th:value="${sn ?: ''}" />
         <input type="hidden" id="hiddenUserTf" th:value="${tf ?: ''}" />
         <input type="hidden" id="hiddenUserJp" th:value="${jp ?: ''}" />
-
-
-        <input type="hidden" id="hiddenIsMatch" th:value="${isMbtiMatch ?: 'false'}" />
     </div>
 
-    <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">
-            ${characterName}
-        </h1>
-        <p class="text-gray-500 text-lg">
-            ${title}
+    <form id="persuade-form" th:action="@{/persudade/transfer-to-persuade}" method="post" style="display: none;">
+        <input type="hidden" name="title" id="formTitle">
+        <input type="hidden" name="characterName" id="formCharacterName">
+        <input type="hidden" name="category" id="formCategory">
+        <input type="hidden" name="aiThing" id="formAiThing">
+        <input type="hidden" name="fullMbti" id="formFullMbti">
+        <input type="hidden" name="valueE" id="formValueE">
+        <input type="hidden" name="valueI" id="formValueI">
+        <input type="hidden" name="valueS" id="formValueS">
+        <input type="hidden" name="valueN" id="formValueN">
+        <input type="hidden" name="valueT" id="formValueT">
+        <input type="hidden" name="valueF" id="formValueF">
+        <input type="hidden" name="valueJ" id="formValueJ">
+        <input type="hidden" name="valueP" id="formValueP">
+        <input type="hidden" name="ei" id="formEi">
+        <input type="hidden" name="sn" id="formSn">
+        <input type="hidden" name="tf" id="formTf">
+        <input type="hidden" name="jp" id="formJp">
+    </form>
+
+
+    <div class="result-box bg-white border border-gray-200 space-y-3">
+        <p class="font-bold text-lg flex items-center text-blue-700">
+            <i data-lucide="square-user" class="w-6 h-6 mr-2 text-blue-500"></i> 분석 대상 정보
         </p>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4">
-
-        <div class="result-box bg-purple-50 space-y-3">
-            <div class="flex items-center text-purple-700">
-                <i data-lucide="user" class="w-5 h-5 mr-2"></i>
-                <span class="font-semibold">당신이 예측한 MBTI</span>
-            </div>
-            <div class="p-3 bg-white rounded-lg w-fit text-xl font-bold text-purple-600 shadow-md">
-                ${fullMbti}
-            </div>
-        </div>
-
-        <div class="result-box bg-blue-50 space-y-3">
-            <div class="flex items-center text-blue-700">
-                <i data-lucide="brain" class="w-5 h-5 mr-2"></i>
-                <span class="font-semibold">AI가 분석한 MBTI</span>
-            </div>
-            <div class="p-3 bg-white rounded-lg w-fit text-xl font-bold text-blue-600 shadow-md">
-                ${aiThing}
-            </div>
+        <div class="info-detail space-y-1 text-base">
+            <p>제목: <span class="font-semibold text-gray-800" th:text="${title ?: 'N/A'}">작품 제목</span></p>
+            <p>등장인물: <span class="font-semibold text-gray-800" th:text="${characterName ?: 'N/A'}">등장인물 이름</span></p>
+            <p>카테고리: <span class="font-semibold text-gray-800" th:text="${category ?: 'N/A'}">카테고리</span></p>
         </div>
     </div>
-
     <div class="bg-white p-6 rounded-xl shadow-lg space-y-5">
         <h2 class="text-lg font-bold text-gray-800 flex items-center">
             <i data-lucide="activity" class="w-5 h-5 mr-2 text-blue-500"></i> AI 분석 상세 지표
         </h2>
 
-        <div>
-            <div class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
-                <span>E 외향</span>
-                <span>에너지의 방향성</span>
-                <span>내향 I</span>
-            </div>
-            <div class="bar-container">
-                <div class="bar-segment" style="width: ${valueE}%;"> ${valueE}%</div>
-                <div class="bar-reverse-segment" style="width: ${valueI}%;"> ${valueI}%</div>
-            </div>
-        </div>
-
-        <div>
-            <div class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
-                <span>S 감각</span>
-                <span>인식 기능</span>
-                <span>직관 N</span>
-            </div>
-            <div class="bar-container">
-                <div class="bar-segment" style="width: ${valueS}%;"> ${valueS}%</div>
-                <div class="bar-reverse-segment" style="width: ${valueN}%;"> ${valueN}%</div>
-            </div>
-        </div>
-
-        <div>
-            <div class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
-                <span>T 사고</span>
-                <span>판단 기능</span>
-                <span>감정 F</span>
-            </div>
-            <div class="bar-container">
-                <div class="bar-segment" style="width: ${valueT}%;"> ${valueT}%</div>
-                <div class="bar-reverse-segment" style="width: ${valueF}%;"> ${valueF}%</div>
-            </div>
-        </div>
-
-        <div>
-            <div class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
-                <span>J 판단</span>
-                <span>생활 양식</span>
-                <span>인식 P</span>
-            </div>
-            <div class="bar-container">
-                <div class="bar-segment" style="width: ${valueJ}%;"> ${valueJ}%</div>
-                <div class="bar-reverse-segment" style="width: ${valueP}%;"> ${valueP}%</div>
-            </div>
+        <div id="bar-charts-container" class="space-y-4">
         </div>
 
     </div>
@@ -223,7 +137,7 @@
     <div id="mbti-message-container">
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="mbti-dimension-cards-container">
     </div>
 
     <div class="bg-white p-5 rounded-xl shadow-lg" id="persuade-section">
@@ -247,13 +161,16 @@
     lucide.createIcons();
 
     // --------------------------------------------------
-    // 0. 숨겨진 필드에서 값 읽어오기
+    // 0. Hidden Field에서 값 읽어오기 (변수 선언)
     // --------------------------------------------------
     const hiddenTitle = document.getElementById('hiddenTitle');
     const hiddenCharacterName = document.getElementById('hiddenCharacterName');
     const hiddenCategory = document.getElementById('hiddenCategory');
-    const hiddenPredictedMbti1 = document.getElementById('hiddenPredictedMbti1');
-    const hiddenPredictedMbti2 = document.getElementById('hiddenPredictedMbti2');
+
+    const hiddenUserFullMbti = document.getElementById('hiddenUserFullMbti'); // 사용자 전체 MBTI
+    const hiddenAiFullMbti = document.getElementById('hiddenAiFullMbti'); // AI 전체 MBTI
+
+    // 상세 값은 바 차트 렌더링에 사용
     const hiddenValueE = document.getElementById('hiddenValueE');
     const hiddenValueI = document.getElementById('hiddenValueI');
     const hiddenValueS = document.getElementById('hiddenValueS');
@@ -263,185 +180,212 @@
     const hiddenValueJ = document.getElementById('hiddenValueJ');
     const hiddenValueP = document.getElementById('hiddenValueP');
 
-    // AI 도출한 MBTI 개별 지표
     const hiddenAiEi = document.getElementById('hiddenAiEi');
     const hiddenAiSn = document.getElementById('hiddenAiSn');
     const hiddenAiTf = document.getElementById('hiddenAiTf');
     const hiddenAiJp = document.getElementById('hiddenAiJp');
 
-    // 사용자 선택한 MBTI 개별 지표
     const hiddenUserEi = document.getElementById('hiddenUserEi');
     const hiddenUserSn = document.getElementById('hiddenUserSn');
     const hiddenUserTf = document.getElementById('hiddenUserTf');
     const hiddenUserJp = document.getElementById('hiddenUserJp');
 
-    // mbti 분석 결과가 일치하는지 판별
-    const hiddenIsMatch = document.getElementById('hiddenIsMatch');
-    const isMbtiMatch = hiddenIsMatch ? (hiddenIsMatch.value === 'true') : false;
+    // AI와 사용자 MBTI가 일치하는지 판단
+    const isMbtiMatch = hiddenUserFullMbti.value === hiddenAiFullMbti.value;
 
 
     // --------------------------------------------------
-    // 1. 전체 일치/불일치 메시지 렌더링
+    // 1. 개별 지표 동적 렌더링 함수 (기존 로직 유지)
     // --------------------------------------------------
-    const container = document.getElementById('mbti-message-container');
+    function renderDimensionCards() {
+        const gridContainer = document.getElementById('mbti-dimension-cards-container');
+        gridContainer.innerHTML = '';
 
-    if (isMbtiMatch) {
-        // 결과 일치 UI (초록색 뉘앙스)
-        container.innerHTML = `
-            <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3">
-                <div class="flex-shrink-0">
-                    <i data-lucide="check-circle" class="w-6 h-6 text-green-500"></i>
-                </div>
-                <p class="text-sm text-green-800 flex-1 leading-relaxed">
-                    <span class="font-semibold">분석이 일치합니다!</span> 당신이 예측한 MBTI와 AI의 분석 결과가 완벽하게 일치했습니다.
-                </p>
-            </div>
-        `;
-    } else {
-        // 결과 불일치 UI (주황색 경고 UI)
-        container.innerHTML = `
-            <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 flex items-start gap-3">
-                <div class="flex-shrink-0">
-                    <i data-lucide="alert-triangle" class="w-6 h-6 text-orange-500"></i>
-                </div>
-                <p class="text-sm text-orange-800 flex-1 leading-relaxed">
-                    <span class="font-semibold">분석 차이가 발견되었습니다.</span> AI와 2개의 출처가 서로 다른 분석 결과를 도출했습니다. 작품의 근거와 논리로 AI를 설득해주세요!
-                </p>
-            </div>
-        `;
-    }
+        const dimensions = [
+            { name: "에너지 방향", user: hiddenUserEi.value, ai: hiddenAiEi.value, options: ['E', 'I'], type: 'E/I' },
+            { name: "인식 기능", user: hiddenUserSn.value, ai: hiddenAiSn.value, options: ['S', 'N'], type: 'S/N' },
+            { name: "판단 기능", user: hiddenUserTf.value, ai: hiddenAiTf.value, options: ['T', 'F'], type: 'T/F' },
+            { name: "생활 양식", user: hiddenUserJp.value, ai: hiddenAiJp.value, options: ['J', 'P'], type: 'J/P' }
+        ];
 
+        let nonMatchDimensions = [];
 
-    // --------------------------------------------------
-    // 2. 개별 지표 일치/불일치 카드 동적 렌더링 로직
-    // --------------------------------------------------
+        dimensions.forEach(dim => {
+            const isMatch = dim.user !== '' && dim.ai !== '' && dim.user === dim.ai;
 
-    const dimensions = [
-        {
-            name: "에너지 방향",
-            user: hiddenUserEi.value,
-            ai: hiddenAiEi.value,
-            options: ['E', 'I'],
-        },
-        {
-            name: "인식 기능",
-            user: hiddenUserSn.value,
-            ai: hiddenAiSn.value,
-            options: ['S', 'N'],
-        },
-        {
-            name: "판단 기능",
-            user: hiddenUserTf.value,
-            ai: hiddenAiTf.value,
-            options: ['T', 'F'],
-        },
-        {
-            name: "생활 양식",
-            user: hiddenUserJp.value,
-            ai: hiddenAiJp.value,
-            options: ['J', 'P'],
-        }
-    ];
+            if (dim.user === '' || dim.ai === '') {
+                // console.error(`Error: Data missing for ${dim.name} dimension.`);
+                return;
+            }
 
-    const gridContainer = document.querySelector('.grid.grid-cols-2.md\:grid-cols-4.gap-3');
-    gridContainer.innerHTML = ''; // 기존 정적 카드 내용 초기화
+            const statusText = isMatch ? '일치' : '불일치';
+            const statusClass = isMatch ? 'bg-green-50' : 'bg-orange-50';
+            const statusTextColor = isMatch ? 'text-green-600' : 'text-red-600';
+            const iconBgClass = isMatch ? 'bg-green-500' : 'bg-red-500';
+            const iconName = isMatch ? 'check' : 'x';
 
-    let nonMatchDimensions = []; // 불일치하는 차원을 저장할 배열
+            const userIconBgClass = isMatch ? 'bg-green-500' : 'bg-purple-500';
+            const aiIconBgClass = isMatch ? 'bg-green-500' : 'bg-blue-500';
 
-    dimensions.forEach(dim => {
-        // user와 ai 값이 같고 비어있지 않을 때 일치로 판단
-        const isMatch = dim.user === dim.ai && dim.user !== '';
+            if (!isMatch) {
+                nonMatchDimensions.push(`${dim.type} (${dim.name})`);
+            }
 
-        // Tailwind CSS 클래스 조건부 설정
-        const matchClass = isMatch ? 'bg-green-50' : 'bg-orange-50';
-        const userIconColor = isMatch ? 'bg-green-500' : 'bg-purple-500';
-        const aiIconColor = isMatch ? 'bg-green-500' : 'bg-blue-500';
-        const centerIconColor = isMatch ? 'bg-green-500' : 'bg-red-500';
-        const textColor = isMatch ? 'text-green-600' : 'text-red-600';
-        const statusText = isMatch ? '일치' : '불일치';
-        const centerIcon = isMatch
-            ? `<i data-lucide="check" class="w-5 h-5"></i>`
-            : `<i data-lucide="x" class="w-5 h-5"></i>`;
-
-        // 불일치하는 차원만 설득 대상 목록에 추가
-        if (!isMatch) {
-            nonMatchDimensions.push(`${dim.options[0]}/${dim.options[1]} (${dim.name})`);
-        }
-
-
-        const cardHtml = `
-            <div class="dimension-card ${matchClass}">
-                <p class="text-sm font-bold text-gray-800 text-left w-full">${dim.name}</p>
-                <div class="flex items-center justify-center gap-2">
-                    <div class="dimension-icon ${userIconColor} text-white">${dim.user || '?'}</div>
-                    <div class="dimension-icon ${centerIconColor} text-white">
-                        ${centerIcon}
+            const cardHtml = `
+                <div class="dimension-card ${statusClass}">
+                    <p class="text-sm font-bold text-gray-800 text-left w-full">${dim.name}</p>
+                    <div class="flex items-center justify-center gap-2">
+                        <div class="dimension-icon ${userIconBgClass} text-white">${dim.user || '?'}</div>
+                        <div class="dimension-icon ${iconBgClass} text-white">
+                            <i data-lucide="${iconName}" class="w-5 h-5"></i>
+                        </div>
+                        <div class="dimension-icon ${aiIconBgClass} text-white">${dim.ai || '?'}</div>
                     </div>
-                    <div class="dimension-icon ${aiIconColor} text-white">${dim.ai || '?'}</div>
+                    <span class="text-sm font-semibold ${statusTextColor}">${statusText}</span>
                 </div>
-                <span class="text-sm font-semibold ${textColor}">${statusText}</span>
-            </div>
-        `;
-
-        gridContainer.innerHTML += cardHtml;
-    });
-
-    // --------------------------------------------------
-    // 3. 설득 대상 차원 버튼 동적 렌더링 및 섹션 표시/숨김
-    // --------------------------------------------------
-
-    const persuadeTargetContainer = document.querySelector('#persuade-section .flex.flex-wrap.gap-3');
-    const persuadeSection = document.getElementById('persuade-section');
-    persuadeTargetContainer.innerHTML = ''; // 기존 버튼 초기화
-
-    if (nonMatchDimensions.length > 0) {
-        // 불일치하는 지표가 있을 경우 버튼을 렌더링하고 섹션을 표시
-        nonMatchDimensions.forEach(dimText => {
-            const buttonHtml = `
-                <button class="px-4 py-2 bg-orange-100 hover:bg-orange-200 text-orange-700 font-semibold rounded-lg transition-colors text-sm">
-                    ${dimText}
-                </button>
             `;
-            persuadeTargetContainer.innerHTML += buttonHtml;
+            gridContainer.innerHTML += cardHtml;
         });
-        persuadeSection.style.display = 'block';
 
-    } else {
-        // 모든 지표가 일치할 경우 버튼 섹션을 숨김
-        persuadeSection.style.display = 'none';
+        renderPersuadeButtons(nonMatchDimensions);
+        lucide.createIcons();
     }
 
+    // --------------------------------------------------
+    // 2. 설득 대상 버튼 렌더링 함수 (기존 로직 유지)
+    // --------------------------------------------------
+    function renderPersuadeButtons(nonMatchDimensions) {
+        const persuadeTargetContainer = document.querySelector('#persuade-section .flex.flex-wrap.gap-3');
+        const persuadeSection = document.getElementById('persuade-section');
+        persuadeTargetContainer.innerHTML = '';
 
-    // 새로 추가된 아이콘을 포함하여 Lucide 아이콘 다시 생성
-    lucide.createIcons();
+        if (nonMatchDimensions.length > 0) {
+            nonMatchDimensions.forEach(dimText => {
+                const buttonHtml = `
+                    <button type="button" class="px-4 py-2 bg-orange-100 hover:bg-orange-200 text-orange-700 font-semibold rounded-lg transition-colors text-sm">
+                        ${dimText}
+                    </button>
+                `;
+                persuadeTargetContainer.innerHTML += buttonHtml;
+            });
+            persuadeSection.style.display = 'block';
 
+        } else {
+            persuadeSection.style.display = 'none';
+        }
+    }
 
     // --------------------------------------------------
-    // 4. 설득 대결 시작하기 버튼 클릭 이벤트 (데이터 전달 로직)
+    // 3. 🌟 바 차트 렌더링 함수 (새로 추가) 🌟
+    // --------------------------------------------------
+    function renderBarCharts() {
+        const barContainer = document.getElementById('bar-charts-container');
+        barContainer.innerHTML = '';
+
+        const chartData = [
+            { type: "에너지의 방향성", left: 'E', right: 'I', valLeft: parseInt(hiddenValueE.value), valRight: parseInt(hiddenValueI.value), labelLeft: '외향', labelRight: '내향' },
+            { type: "인식 기능", left: 'S', right: 'N', valLeft: parseInt(hiddenValueS.value), valRight: parseInt(hiddenValueN.value), labelLeft: '감각', labelRight: '직관' },
+            { type: "판단 기능", left: 'T', right: 'F', valLeft: parseInt(hiddenValueT.value), valRight: parseInt(hiddenValueF.value), labelLeft: '사고', labelRight: '감정' },
+            { type: "생활 양식", left: 'J', right: 'P', valLeft: parseInt(hiddenValueJ.value), valRight: parseInt(hiddenValueP.value), labelLeft: '판단', labelRight: '인식' }
+        ];
+
+        chartData.forEach(data => {
+            const total = data.valLeft + data.valRight;
+
+            // 값이 모두 0인 경우는 렌더링하지 않음
+            if (total === 0) return;
+
+            const percentLeft = Math.round((data.valLeft / total) * 100);
+            const percentRight = 100 - percentLeft;
+
+            // 더 큰 값에 따라 색상 클래스 결정
+            const colorLeft = (percentLeft > percentRight) ? 'var(--blue-main)' : '#e5e7eb';
+            const colorRight = (percentRight > percentLeft) ? 'var(--blue-main)' : '#e5e7eb';
+
+            // 비율 텍스트 색상 결정 (색상이 파란색인 부분은 흰색 텍스트, 회색인 부분은 검은색 텍스트)
+            const textLeftColor = (percentLeft > percentRight) ? 'white' : '#1f2937';
+            const textRightColor = (percentRight > percentLeft) ? 'white' : '#1f2937';
+
+            const itemHtml = `
+                <div class="bar-chart-item">
+                    <div class="flex justify-between text-base font-semibold mb-1 text-gray-800">
+                        <span class="bar-text-label-left flex items-center gap-1">
+                            <span class="bar-icon">${data.left}</span> ${data.labelLeft}
+                        </span>
+                        <span>
+                            ${data.type}
+                        </span>
+                        <span class="bar-text-label-right flex items-center gap-1">
+                            ${data.labelRight} <span class="bar-icon">${data.right}</span>
+                        </span>
+                    </div>
+                    <div class="bar-container-new">
+                        <div class="bar-segment-left" style="width: ${percentLeft}%; background-color: ${colorLeft};"></div>
+                        <div class="bar-segment-right" style="width: ${percentRight}%; background-color: ${colorRight};"></div>
+                        <div class="bar-label-overlay">
+                            <span style="width: ${percentLeft}%; text-align: right; padding-right: 0.5rem; color: ${textLeftColor};">${percentLeft}%</span>
+                            <span style="width: ${percentRight}%; text-align: left; padding-left: 0.5rem; color: ${textRightColor};">${percentRight}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            barContainer.innerHTML += itemHtml;
+        });
+    }
+
+    // --------------------------------------------------
+    // 4. 설득 대결 시작하기 버튼 클릭 이벤트 (기존 로직 유지)
     // --------------------------------------------------
     const persuadeButton = document.getElementById('persuade-button');
-    persuadeButton.addEventListener('click', () => {
-        // 모든 데이터를 쿼리 파라미터로 조합하여 다음 페이지로 전달
-        const nextUrl = `/persuade/start?` +
-            `title=${encodeURIComponent(hiddenTitle.value)}&` +
-            `characterName=${encodeURIComponent(hiddenCharacterName.value)}&` +
-            `category=${encodeURIComponent(hiddenCategory.value)}&` +
-            //사용자가 생각하는 mbti
-            `predictedMbti1=${encodeURIComponent(hiddenPredictedMbti1.value)}&` +
-            //ai가 생각하는 mbti
-            `predictedMbti2=${encodeURIComponent(hiddenPredictedMbti2.value)}&` +
-            `aiEi=${hiddenAiEi.value}&` +
-            `aiSn=${hiddenAiSn.value}&` +
-            `aiTf=${hiddenAiTf.value}&` +
-            `aiJp=${hiddenAiJp.value}&` +
-            `valueE=${hiddenValueE.value}&valueI=${hiddenValueI.value}&` +
-            `valueS=${hiddenValueS.value}&valueN=${hiddenValueN.value}&` +
-            `valueT=${hiddenValueT.value}&valueF=${hiddenValueF.value}&` +
-            `valueJ=${hiddenValueJ.value}&valueP=${hiddenValueP.value}&`;
+    const form = document.getElementById('persuade-form');
 
-        console.log("다음 URL로 이동:", nextUrl);
-        window.location.href = nextUrl;
+    persuadeButton.addEventListener('click', () => {
+
+        // 폼 필드에 값 채워넣기 (POST 전송 준비)
+        document.getElementById('formTitle').value = hiddenTitle.value;
+        document.getElementById('formCharacterName').value = hiddenCharacterName.value;
+        document.getElementById('formCategory').value = hiddenCategory.value;
+        document.getElementById('formAiThing').value = document.getElementById('hiddenAiThing') ? document.getElementById('hiddenAiThing').value : '';
+        document.getElementById('formFullMbti').value = hiddenUserFullMbti.value;
+
+        document.getElementById('formValueE').value = hiddenValueE.value;
+        document.getElementById('formValueI').value = hiddenValueI.value;
+        document.getElementById('formValueS').value = hiddenValueS.value;
+        document.getElementById('formValueN').value = hiddenValueN.value;
+        document.getElementById('formValueT').value = hiddenValueT.value;
+        document.getElementById('formValueF').value = hiddenValueF.value;
+        document.getElementById('formValueJ').value = hiddenValueJ.value;
+        document.getElementById('formValueP').value = hiddenValueP.value;
+
+        document.getElementById('formEi').value = hiddenUserEi.value;
+        document.getElementById('formSn').value = hiddenUserSn.value;
+        document.getElementById('formTf').value = hiddenUserTf.value;
+        document.getElementById('formJp').value = hiddenUserJp.value;
+
+        form.submit();
     });
+
+    // --------------------------------------------------
+    // 5. 페이지 로드 시 초기화 및 렌더링 호출
+    // --------------------------------------------------
+
+    // 전체 일치 메시지 컨테이너 렌더링
+    const mbtiMessageContainer = document.getElementById('mbti-message-container');
+
+    if (isMbtiMatch) {
+        mbtiMessageContainer.innerHTML = `<div class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3"><div class="flex-shrink-0"><i data-lucide="check-circle" class="w-6 h-6 text-green-500"></i></div><p class="text-sm text-green-800 flex-1 leading-relaxed"><span class="font-semibold">분석이 일치합니다!</span> 당신이 예측한 MBTI와 AI의 분석 결과가 완벽하게 일치했습니다.</p></div>`;
+    } else {
+        mbtiMessageContainer.innerHTML = `<div class="bg-orange-50 border border-orange-200 rounded-xl p-4 flex items-start gap-3"><div class="flex-shrink-0"><i data-lucide="alert-triangle" class="w-6 h-6 text-orange-500"></i></div><p class="text-sm text-orange-800 flex-1 leading-relaxed"><span class="font-semibold">분석 차이가 발견되었습니다.</span> AI와 2개의 출처가 서로 다른 분석 결과를 도출했습니다. 작품의 근거와 논리로 AI를 설득해주세요!</p></div>`;
+    }
+
+    // 🌟 바 차트 렌더링 함수 실행 (가장 먼저 표시)
+    renderBarCharts();
+
+    // 개별 지표 카드 렌더링 함수 실행
+    renderDimensionCards();
+
+    // 동적 삽입된 아이콘 재렌더링
+    lucide.createIcons();
 
 </script>
 </body>

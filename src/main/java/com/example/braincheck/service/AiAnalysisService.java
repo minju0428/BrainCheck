@@ -10,7 +10,7 @@ import java.util.Map;
 public class AiAnalysisService {
 
     //ai가 생각하는 mbti 각각 분리하는 메서드
-    public Map<String, String> procoessForPersude(Map<String, String> persuadeData) {
+    public Map<String, String> processForPersuade(Map<String, String> persuadeData) {
 
         String aiThing = persuadeData.get("aiThing");
 

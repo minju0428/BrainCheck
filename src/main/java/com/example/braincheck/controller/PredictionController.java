@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -150,6 +151,27 @@ public class PredictionController {
                                    Model model) { //html로 데이터 전달을 하기 위한 객체 생성
         String fullMbti = ei + sn +tf + jp;
 
+        String redirectUrl = UriComponentsBuilder.fromPath("/persudade/ai-analysis-result")
+                .queryParam("ei", ei)
+                .queryParam("sn", sn)
+                .queryParam("tf", tf)
+                .queryParam("jp", jp)
+                .queryParam("title", title) // 한글 값 자동 인코딩
+                .queryParam("characterName", characterName) // 한글 값 자동 인코딩
+                .queryParam("category", category)
+                .queryParam("aiThing", aiThing)
+                .queryParam("valueE", valueE)
+                .queryParam("valueI", valueI)
+                .queryParam("valueS", valueS)
+                .queryParam("valueN", valueN)
+                .queryParam("valueT", valueT)
+                .queryParam("valueF", valueF)
+                .queryParam("valueJ", valueJ)
+                .queryParam("valueP", valueP)
+                .build()
+                .encode() // ⭐️ 필수: URI 인코딩 수행
+                .toUriString();
+
         // 리다이렉션 후 수신된 데이터 확인
         System.out.println("=== 쿼리 파라미터 수신 데이터 확인 (userSelectedMbti) ===");
         System.out.println("제목 (수신): " + title);
@@ -191,9 +213,7 @@ public class PredictionController {
         model.addAttribute("jp", jp);
 
 
-        //다음 이동할 화면 이름을 적으면 됨.
-        //다음 화면 구현시 바꾸기
-        return "HomeActivity";
+        return "redirect:" + redirectUrl;
 
 
 
