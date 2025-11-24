@@ -1,7 +1,7 @@
 package com.example.braincheck.service;
-//CharacterController.java 파일에 지정된 변수들을 ai로 검증하는 코드 파일
 
 import com.example.braincheck.dto.CharacterFormDto;
+import com.example.braincheck.dto.PersuasionBattleDto;
 import com.google.cloud.vertexai.VertexAI;
 import com.google.cloud.vertexai.api.GenerateContentResponse;
 import com.google.cloud.vertexai.generativeai.ContentMaker;
@@ -9,14 +9,10 @@ import com.google.cloud.vertexai.generativeai.GenerativeModel;
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
-@Service
-public class CharacterValidationService {
-
+public class PersuasionBattleService {
     //Gemini API 연동을 위한 설정값들
     @Value("${gemini.api.key:}")
     private String apiKey;
@@ -36,10 +32,10 @@ public class CharacterValidationService {
 
 
     //피라미터가 있는 생성자만 남겨 spring이 이를 사용함.
-    public CharacterValidationService(
+    public PersuasionBattleService(
             @Value("${gemini.project.id:}") String projectId,
             @Value("${gemini.location:us-central1}") String location,
-            @Value("${gemini.model.name:gemini-2.5-flash}") String modelName) throws IOException{
+            @Value("${gemini.model.name:gemini-2.5-flash}") String modelName) throws IOException {
 
         //
         this.vertexAI = new VertexAI(projectId, location);
@@ -59,11 +55,11 @@ public class CharacterValidationService {
 
 
     //상세 정보 조회 함수
-    public String  RetrieveDetailedInformation(CharacterFormDto characterFormDto) {
+    public String  RetrieveDetailedInformation(PersuasionBattleDto persuasionBattleDto) {
         try {
-            String characterName = characterFormDto.getCharacterName();
-            String title = characterFormDto.getTitle();
-            String category = characterFormDto.getCategory();
+            String characterName = persuasionBattleDto.getCharacterName();
+            String title = persuasionBattleDto.getTitle();
+            String category = persuasionBattleDto.getCategory();
 
             //프롬프트 구성 : 넘겨 받은 질문이외의 부가 질문 부분
             //String.format() : Java에서 특정 형식(format)에 맞춰 문자열을 생성할 때 사용하는 정적(static) 메서드
@@ -142,8 +138,4 @@ public class CharacterValidationService {
             return "에러 시 발생하는 메시지 적기" + e.getMessage();
         }
     }
-
-
-
-
 }

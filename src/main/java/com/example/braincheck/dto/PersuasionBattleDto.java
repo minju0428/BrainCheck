@@ -2,10 +2,9 @@ package com.example.braincheck.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor //기본 생성자를 자동으로 생성하는 어노테이션
-public class AiAnalysisDto {
+public class PersuasionBattleDto {
+
     //전달받은 필드 선언
     @NotBlank(message = "선택한 등장인물")
     private String characterName;
@@ -13,8 +12,7 @@ public class AiAnalysisDto {
     private String title;
     @NotBlank(message = "선택한 카테고리")
     private String category;
-
-    //ai가 도출한 MBTI
+    
     @NotBlank(message = "ai가 생각하는 MBTI")
     private String aiThing;
 
@@ -236,5 +234,4 @@ public class AiAnalysisDto {
     public void setJp(String jp) {
         this.jp = jp;
     }
-
 }
