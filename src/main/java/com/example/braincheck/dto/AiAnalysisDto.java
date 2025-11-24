@@ -66,6 +66,16 @@ public class AiAnalysisDto {
     @NotNull(message = "생활 양식은 필수 항목입니다.")
     private String jp;
 
+    //ai와 사용자 불일치 정보
+    @NotNull(message = "E/I 불일치 여부는 필수 항목입니다.")
+    private Boolean eiMismatch;
+    @NotNull(message = "S/N 불일치 여부는 필수 항목입니다.")
+    private Boolean snMismatch;
+    @NotNull(message = "T/F 불일치 여부는 필수 항목입니다.")
+    private Boolean tfMismatch;
+    @NotNull(message = "J/P 불일치 여부는 필수 항목입니다.")
+    private Boolean jpMismatch;
+
 
     //스프링이 데이터를 매핑할 수 있도록 하는 것들
     //Getter
@@ -154,7 +164,10 @@ public class AiAnalysisDto {
         return jp;
     }
 
-
+    public Boolean getEiMismatch() { return eiMismatch; }
+    public Boolean getSnMismatch() { return snMismatch; }
+    public Boolean getTfMismatch() { return tfMismatch; }
+    public Boolean getJpMismatch() { return jpMismatch; }
 
     //Setter
     public void setCharacterName(String characterName) {
@@ -236,5 +249,10 @@ public class AiAnalysisDto {
     public void setJp(String jp) {
         this.jp = jp;
     }
+
+    public void setEiMismatch(Boolean eiMismatch) { this.eiMismatch = eiMismatch; }
+    public void setSnMismatch(Boolean snMismatch) { this.snMismatch = snMismatch; }
+    public void setTfMismatch(Boolean tfMismatch) { this.tfMismatch = tfMismatch; }
+    public void setJpMismatch(Boolean jpMismatch) { this.jpMismatch = jpMismatch; }
 
 }
