@@ -42,6 +42,10 @@ public class PersuasionBattleController {
             @RequestParam("aiSn") String aiSn,
             @RequestParam("aiTf") String aiTf,
             @RequestParam("aiJp") String aiJp,
+            @RequestParam("eiMismatch") boolean eiMismatch,
+            @RequestParam("snMismatch") boolean snMismatch,
+            @RequestParam("tfMismatch") boolean tfMismatch,
+            @RequestParam("jpMismatch") boolean jpMismatch,
             Model model
     ) {
         String fullMbti = ei + sn + tf + jp;
@@ -101,6 +105,11 @@ public class PersuasionBattleController {
         model.addAttribute("tf", tf);
         model.addAttribute("jp", jp);
 
+        model.addAttribute("eiMismatch", eiMismatch);
+        model.addAttribute("snMismatch", snMismatch);
+        model.addAttribute("tfMismatch", tfMismatch);
+        model.addAttribute("jpMismatch", jpMismatch);
+
 
 
         return "PersuasionBattleActivity";
@@ -131,38 +140,13 @@ public class PersuasionBattleController {
             @RequestParam("sn") String sn,
             @RequestParam("tf") String tf,
             @RequestParam("jp") String jp,
+            @RequestParam("eiMismatch") boolean eiMismatch,
+            @RequestParam("snMismatch") boolean snMismatch,
+            @RequestParam("tfMismatch") boolean tfMismatch,
+            @RequestParam("jpMismatch") boolean jpMismatch,
 
             // 다음 페이지로 데이터를 안전하게 전달하기 위한 객체
             RedirectAttributes redirectAttributes){
-
-        //ai와 사용자의 MBTI가 불일치한 경우 저장하는 로직
-        List<String> unmatchedAxis = new ArrayList<>(); // 불일치 MBTI 저장하는 변수 (EI, SN, TF, JP)
-        List<String> userUnmatchedValue = new ArrayList<>(); // 불일치한 MBTI에 대한 사용자의 선택한 각각의 MBTI
-
-
-        if (!ei.equals(aiEi)) {
-            unmatchedAxis.add("EI");
-            userUnmatchedValue.add(ei);
-        }
-        if (!sn.equals(aiSn)) {
-            unmatchedAxis.add("SN");
-            userUnmatchedValue.add(sn);
-        }
-        if (!tf.equals(aiTf)) {
-            unmatchedAxis.add("TF");
-            userUnmatchedValue.add(tf);
-        }
-        if (!jp.equals(aiJp)) {
-            unmatchedAxis.add("JP");
-            userUnmatchedValue.add(jp);
-        }
-        //리다이렉션은 String 형태로 전달함. 그래서 List를 쉼표로 구분한 String으로 변환
-        String unmatchedAxisStr = String.join(",", unmatchedAxis);
-        String userUnmatchedValueStr = String.join(",", userUnmatchedValue);
-
-        log.info("불일치 지표 (Axis): {}", unmatchedAxisStr);
-        log.info("사용자 불일치 값 (Value): {}", userUnmatchedValueStr);
-
 
 
 
@@ -188,9 +172,12 @@ public class PersuasionBattleController {
         redirectAttributes.addAttribute("tf", tf);
         redirectAttributes.addAttribute("jp", jp);
 
-        redirectAttributes.addAttribute("unmatchedAxis", unmatchedAxisStr);
-        redirectAttributes.addAttribute("userUnmatchedValue", userUnmatchedValueStr);
 
+
+        redirectAttributes.addAttribute("eiMismatch", eiMismatch);
+        redirectAttributes.addAttribute("snMismatch", snMismatch);
+        redirectAttributes.addAttribute("tfMismatch", tfMismatch);
+        redirectAttributes.addAttribute("jpMismatch", jpMismatch);
 
         //다음 페이지 리다이렉션 주소
         return "redirect:/PersuasionBattleActivity";
