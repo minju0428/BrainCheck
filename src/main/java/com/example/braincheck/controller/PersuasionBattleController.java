@@ -46,6 +46,7 @@ public class PersuasionBattleController {
             @RequestParam("snMismatch") boolean snMismatch,
             @RequestParam("tfMismatch") boolean tfMismatch,
             @RequestParam("jpMismatch") boolean jpMismatch,
+            @RequestParam(value = "currentRound", defaultValue = "1") int currentRound,
             Model model
     ) {
         String fullMbti = ei + sn + tf + jp;
@@ -53,8 +54,8 @@ public class PersuasionBattleController {
         // 주로 제네릭 타입(List<String>)과 로우 타입(List - 제네릭을 명시하지 않은 타입) 간의 변환이나 캐스팅(Casting) 과정에서 발생하는 경고 무시하는 어노테이션
         @SuppressWarnings("unchecked")
 
-        List<String> battleList = (List<String>) model.asMap().get("battleList");
-        String dimension = (String) model.asMap().get("dimension");
+        List<String> battleList = (List<String>) model.asMap().get("battleList");  //불일치한 MBTI
+        String dimension = (String) model.asMap().get("dimension");//현재 설득 MBTI
 
         @SuppressWarnings("unchecked")
         List<String> userHistoryList = (List<String>) model.asMap().get("userHistoryList");
@@ -121,6 +122,8 @@ public class PersuasionBattleController {
         model.addAttribute("snMismatch", snMismatch);
         model.addAttribute("tfMismatch", tfMismatch);
         model.addAttribute("jpMismatch", jpMismatch);
+
+        model.addAttribute("currentRound", currentRound);
 
         model.addAttribute("battleList", battleList);
         model.addAttribute("dimension", dimension);
