@@ -50,12 +50,20 @@ public class PersuasionBattleController {
     ) {
         String fullMbti = ei + sn + tf + jp;
 
+        // 주로 제네릭 타입(List<String>)과 로우 타입(List - 제네릭을 명시하지 않은 타입) 간의 변환이나 캐스팅(Casting) 과정에서 발생하는 경고 무시하는 어노테이션
+        @SuppressWarnings("unchecked")
+
+        List<String> battleList = (List<String>) model.asMap().get("battleList");
+        String dimension = (String) model.asMap().get("dimension");
+
 
 
         log.info("=== AI 분석 결과 화면 수신 데이터 확인 ===");
         log.info("최종 MBTI: {}", fullMbti);
         log.info("제목: {}, 등장인물: {}, 카테고리: {}", title, characterName, category);
 
+        log.info("불일치 지표 리스트 (battleList): {}", battleList);
+        log.info("현재 설득할 차원 (dimension): {}", dimension);
 
         System.out.println("--- 사용자 MBTI 유형 선택 ---");
         System.out.println("E/I 유형: " + ei);
@@ -110,6 +118,9 @@ public class PersuasionBattleController {
         model.addAttribute("tfMismatch", tfMismatch);
         model.addAttribute("jpMismatch", jpMismatch);
 
+        model.addAttribute("battleList", battleList);
+        model.addAttribute("dimension", dimension);
+
 
 
         return "PersuasionBattleActivity";
@@ -145,6 +156,9 @@ public class PersuasionBattleController {
             @RequestParam("tfMismatch") boolean tfMismatch,
             @RequestParam("jpMismatch") boolean jpMismatch,
 
+            @RequestParam(value = "battleList", required = false) List<String> battleList,
+            @RequestParam(value = "dimension", required = false) String dimension,
+
             // 다음 페이지로 데이터를 안전하게 전달하기 위한 객체
             RedirectAttributes redirectAttributes){
 
@@ -179,8 +193,11 @@ public class PersuasionBattleController {
         redirectAttributes.addAttribute("tfMismatch", tfMismatch);
         redirectAttributes.addAttribute("jpMismatch", jpMismatch);
 
+        redirectAttributes.addFlashAttribute("battleList", battleList);
+        redirectAttributes.addFlashAttribute("dimension", dimension);
+
         //다음 페이지 리다이렉션 주소
-        return "redirect:/PersuasionBattleActivity";
+        return "redirect:/persuade/start";
 
 
     }
