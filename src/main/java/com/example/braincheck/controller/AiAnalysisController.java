@@ -221,7 +221,9 @@ public class AiAnalysisController {
         redirectAttributes.addAttribute("snMismatch", processedData.get("snMismatch"));
         redirectAttributes.addAttribute("tfMismatch", processedData.get("tfMismatch"));
         redirectAttributes.addAttribute("jpMismatch", processedData.get("jpMismatch"));
+
         redirectAttributes.addFlashAttribute("battleList", processedData.get("battleList"));
+        redirectAttributes.addFlashAttribute("dimension", processedData.get("dimension"));
 
         log.info("Flash Attribute로 전달되는 설득 데이터 (분리된 AI 지표 포함): {}", processedData);
 

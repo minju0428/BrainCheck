@@ -66,8 +66,15 @@ public class AiAnalysisService {
                 battleList.add("JP");
             }
 
+            //현재 설득 차원
+            String dimension = "";
+            if (!battleList.isEmpty()) {
+                dimension = battleList.get(0);
+            }
+
             // 생성된 리스트를 Map에 저장
             processedData.put("battleList", battleList);
+            processedData.put("dimension", dimension);
 
         } else {
             log.error("aiThing 데이터가 유효하지 않거나 4글자가 아닙니다: {}", aiThing);
