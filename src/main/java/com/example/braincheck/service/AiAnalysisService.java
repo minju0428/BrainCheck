@@ -18,6 +18,15 @@ public class AiAnalysisService {
         Map<String, Object> processedData = new HashMap<>(persuadeData);
         String aiThing = persuadeData.get("aiThing");
 
+        //현재 라운드
+        int initialRound = 1;
+        //현재 설득률
+        int initialPersuasionRate = 0;
+        //설득률을 담을 리스트
+        List<Integer> persuasionRateList = new ArrayList<>();
+
+        processedData.put("persuasionRateList", persuasionRateList);
+
         if(aiThing != null && aiThing.length() == 4) {
 
             //aiThing 문자열로 분리

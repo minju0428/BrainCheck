@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.swing.text.html.ObjectView;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -161,6 +163,14 @@ public class AiAnalysisController {
 
         // 모든 데이터 저장함.
         Map<String, String> persuadeData = new HashMap<>();
+
+        //현재 라운드
+        int initialRound = 1;
+        //현재 설득률
+        int initialPersuasionRate = 0;
+        //설득률을 담을 리스트
+        List<Integer> persuasionRateList = new ArrayList<>();
+
         persuadeData.put("title", title);
         persuadeData.put("characterName", characterName);
         persuadeData.put("category", category);
@@ -178,11 +188,6 @@ public class AiAnalysisController {
         persuadeData.put("sn", sn);
         persuadeData.put("tf", tf);
         persuadeData.put("jp", jp);
-
-
-
-
-
 
 
         //service 계층 호출
@@ -222,12 +227,19 @@ public class AiAnalysisController {
         redirectAttributes.addAttribute("tfMismatch", processedData.get("tfMismatch"));
         redirectAttributes.addAttribute("jpMismatch", processedData.get("jpMismatch"));
 
+
+        redirectAttributes.addAttribute("currentRound", processedData.get("currentRound"));
+        redirectAttributes.addAttribute("persuasionRate", processedData.get("persuasionRate"));
+
         redirectAttributes.addFlashAttribute("battleList", processedData.get("battleList"));
         redirectAttributes.addFlashAttribute("dimension", processedData.get("dimension"));
 
 
         redirectAttributes.addFlashAttribute("userHistoryList", processedData.get("userHistoryList"));
         redirectAttributes.addFlashAttribute("aiFeedbackList", processedData.get("aiFeedbackList"));
+
+        redirectAttributes.addFlashAttribute("persuasionRateList", processedData.get("persuasionRateList"));
+
         log.info("Flash Attribute로 전달되는 설득 데이터 (분리된 AI 지표 포함): {}", processedData);
 
         // 설득 대결 시작 페이지로 리다이렉트 (예시 경로: /persuade/start)
