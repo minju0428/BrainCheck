@@ -3,6 +3,8 @@ package com.example.braincheck.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 public class PersuasionBattleDto {
 
     //전달받은 필드 선언
@@ -68,6 +70,9 @@ public class PersuasionBattleDto {
     private Boolean snMismatch;
     private Boolean tfMismatch;
     private Boolean jpMismatch;
+
+    private List<String> battleList;
+    private String dimension;
 
 
     //스프링이 데이터를 매핑할 수 있도록 하는 것들
@@ -174,6 +179,15 @@ public class PersuasionBattleDto {
         return jpMismatch;
     }
 
+    public List<String> getBattleList() {
+        return battleList;
+    }
+
+    public String getDimension() {
+        return dimension;
+    }
+
+
 
     //Setter
     public void setCharacterName(String characterName) {
@@ -270,5 +284,12 @@ public class PersuasionBattleDto {
 
     public void setJpMismatch(Boolean jpMismatch) {
         this.jpMismatch = jpMismatch;
+    }
+    public void setBattleList(List<String> battleList) {
+        this.battleList = battleList;
+    }
+
+    public void setDimension(String dimension) {
+        this.dimension = dimension;
     }
 }
