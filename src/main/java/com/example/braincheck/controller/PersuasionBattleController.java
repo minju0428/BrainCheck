@@ -56,6 +56,10 @@ public class PersuasionBattleController {
         List<String> battleList = (List<String>) model.asMap().get("battleList");
         String dimension = (String) model.asMap().get("dimension");
 
+        @SuppressWarnings("unchecked")
+        List<String> userHistoryList = (List<String>) model.asMap().get("userHistoryList");
+        @SuppressWarnings("unchecked")
+        List<String> aiFeedbackList = (List<String>) model.asMap().get("aiFeedbackList");
 
 
         log.info("=== AI 분석 결과 화면 수신 데이터 확인 ===");
@@ -121,6 +125,8 @@ public class PersuasionBattleController {
         model.addAttribute("battleList", battleList);
         model.addAttribute("dimension", dimension);
 
+        model.addAttribute("userHistoryList", userHistoryList);
+        model.addAttribute("aiFeedbackList", aiFeedbackList);
 
 
         return "PersuasionBattleActivity";

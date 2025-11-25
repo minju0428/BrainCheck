@@ -74,6 +74,9 @@ public class PersuasionBattleDto {
     private List<String> battleList;
     private String dimension;
 
+    private List<String> userHistoryList;
+    private List<String> aiFeedbackList;
+
 
     //스프링이 데이터를 매핑할 수 있도록 하는 것들
     //Getter
@@ -91,6 +94,8 @@ public class PersuasionBattleDto {
 
         return category;
     }
+
+
 
     public String getAiThing() {
         return aiThing;
@@ -185,6 +190,14 @@ public class PersuasionBattleDto {
 
     public String getDimension() {
         return dimension;
+    }
+
+    public List<String> getUserHistoryList() {
+        return userHistoryList;
+    }
+
+    public List<String> getAiFeedbackList() {
+        return aiFeedbackList;
     }
 
 
@@ -291,5 +304,12 @@ public class PersuasionBattleDto {
 
     public void setDimension(String dimension) {
         this.dimension = dimension;
+    }
+    public void setUserHistoryList(List<String> userHistoryList) {
+        this.userHistoryList = userHistoryList;
+    }
+
+    public void setAiFeedbackList(List<String> aiFeedbackList) {
+        this.aiFeedbackList = aiFeedbackList;
     }
 }
