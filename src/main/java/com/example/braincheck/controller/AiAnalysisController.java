@@ -225,6 +225,9 @@ public class AiAnalysisController {
         redirectAttributes.addFlashAttribute("battleList", processedData.get("battleList"));
         redirectAttributes.addFlashAttribute("dimension", processedData.get("dimension"));
 
+
+        redirectAttributes.addFlashAttribute("userHistoryList", processedData.get("userHistoryList"));
+        redirectAttributes.addFlashAttribute("aiFeedbackList", processedData.get("aiFeedbackList"));
         log.info("Flash Attribute로 전달되는 설득 데이터 (분리된 AI 지표 포함): {}", processedData);
 
         // 설득 대결 시작 페이지로 리다이렉트 (예시 경로: /persuade/start)

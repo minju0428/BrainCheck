@@ -76,6 +76,16 @@ public class AiAnalysisService {
             processedData.put("battleList", battleList);
             processedData.put("dimension", dimension);
 
+            //사용자가 입력한 설득(채팅) 내용을 저장할 리스트
+            List<String> userHistoryList = new ArrayList<>();
+
+            // AI가 답변한 피드백 내용을 저장할 리스트
+            List<String> aiFeedbackList = new ArrayList<>();
+
+            // Map에 담아서 반환 (다음 컨트롤러/뷰에서 사용 가능)
+            processedData.put("userHistoryList", userHistoryList);
+            processedData.put("aiFeedbackList", aiFeedbackList);
+
         } else {
             log.error("aiThing 데이터가 유효하지 않거나 4글자가 아닙니다: {}", aiThing);
             processedData.put("aiEi", "");
@@ -86,6 +96,8 @@ public class AiAnalysisService {
             processedData.put("snMismatch", false);
             processedData.put("tfMismatch", false);
             processedData.put("jpMismatch", false);
+            processedData.put("userHistoryList", new ArrayList<>());
+            processedData.put("aiFeedbackList", new ArrayList<>());
         }
 
         log.info("Service: AI MBTI 지표 분리 처리 완료.");
