@@ -12,10 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 @Service
-public class CharacterValidationService {
+public class AiPromptService {
 
     //Gemini API 연동을 위한 설정값들
     @Value("${gemini.api.key:}")
@@ -36,7 +35,7 @@ public class CharacterValidationService {
 
 
     //피라미터가 있는 생성자만 남겨 spring이 이를 사용함.
-    public CharacterValidationService(
+    public AiPromptService(
             @Value("${gemini.project.id:}") String projectId,
             @Value("${gemini.location:us-central1}") String location,
             @Value("${gemini.model.name:gemini-2.5-flash}") String modelName) throws IOException{

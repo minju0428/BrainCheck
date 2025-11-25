@@ -1,7 +1,7 @@
 package com.example.braincheck.controller;
 
 import com.example.braincheck.dto.CharacterFormDto;
-import com.example.braincheck.service.CharacterValidationService;
+import com.example.braincheck.service.AiPromptService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -30,10 +30,10 @@ import java.util.stream.Collectors;
 public class CharacterController {
 
     //서비스 의존성 주입을 위한 선언
-    private final CharacterValidationService characterValidationService;
+    private final AiPromptService characterValidationService;
 
     //생성자 추가로 필드 초기화
-    public CharacterController(CharacterValidationService characterValidationService) {
+    public CharacterController(AiPromptService characterValidationService) {
         this.characterValidationService = characterValidationService;
     }
 
