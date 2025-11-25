@@ -77,6 +77,14 @@ public class PersuasionBattleDto {
     private List<String> userHistoryList;
     private List<String> aiFeedbackList;
 
+    @NotNull(message = "현재 라운드는 필수 항목입니다.")
+    private Integer currentRound;
+
+    @NotNull(message = "현재 설득률은 필수 항목입니다.")
+    private Integer persuasionRate;
+
+    private List<Integer> persuasionRateList;
+
 
     //스프링이 데이터를 매핑할 수 있도록 하는 것들
     //Getter
@@ -200,6 +208,18 @@ public class PersuasionBattleDto {
         return aiFeedbackList;
     }
 
+    public Integer getCurrentRound() {
+        return currentRound;
+    }
+
+    public Integer getPersuasionRate() {
+        return persuasionRate;
+    }
+
+    public List<Integer> getPersuasionRateList() {
+        return persuasionRateList;
+    }
+
 
 
     //Setter
@@ -312,4 +332,17 @@ public class PersuasionBattleDto {
     public void setAiFeedbackList(List<String> aiFeedbackList) {
         this.aiFeedbackList = aiFeedbackList;
     }
+
+    public void setCurrentRound(Integer currentRound) {
+        this.currentRound = currentRound;
+    }
+
+    public void setPersuasionRate(Integer persuasionRate) {
+        this.persuasionRate = persuasionRate;
+    }
+
+    public void setPersuasionRateList(List<Integer> persuasionRateList) {
+        this.persuasionRateList = persuasionRateList;
+    }
+
 }

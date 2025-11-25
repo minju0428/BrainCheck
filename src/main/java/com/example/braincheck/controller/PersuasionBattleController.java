@@ -47,13 +47,12 @@ public class PersuasionBattleController {
             @RequestParam("tfMismatch") boolean tfMismatch,
             @RequestParam("jpMismatch") boolean jpMismatch,
             @RequestParam(value = "currentRound", defaultValue = "1") int currentRound,
-            Model model
-    ) {
+            @RequestParam(value = "persuasionRate", defaultValue = "0") int persuasionRate,
+            Model model) {
         String fullMbti = ei + sn + tf + jp;
 
         // 주로 제네릭 타입(List<String>)과 로우 타입(List - 제네릭을 명시하지 않은 타입) 간의 변환이나 캐스팅(Casting) 과정에서 발생하는 경고 무시하는 어노테이션
         @SuppressWarnings("unchecked")
-
         List<String> battleList = (List<String>) model.asMap().get("battleList");  //불일치한 MBTI
         String dimension = (String) model.asMap().get("dimension");//현재 설득 MBTI
 
@@ -61,7 +60,8 @@ public class PersuasionBattleController {
         List<String> userHistoryList = (List<String>) model.asMap().get("userHistoryList");
         @SuppressWarnings("unchecked")
         List<String> aiFeedbackList = (List<String>) model.asMap().get("aiFeedbackList");
-
+        @SuppressWarnings("unchecked")
+        List<Integer> persuasionRateList = (List<Integer>) model.asMap().get("persuasionRateList");
 
         log.info("=== AI 분석 결과 화면 수신 데이터 확인 ===");
         log.info("최종 MBTI: {}", fullMbti);
@@ -124,12 +124,14 @@ public class PersuasionBattleController {
         model.addAttribute("jpMismatch", jpMismatch);
 
         model.addAttribute("currentRound", currentRound);
+        model.addAttribute("persuasionRate", persuasionRate); //설득률
 
         model.addAttribute("battleList", battleList);
         model.addAttribute("dimension", dimension);
 
         model.addAttribute("userHistoryList", userHistoryList);
         model.addAttribute("aiFeedbackList", aiFeedbackList);
+        model.addAttribute("persuasionRateList", persuasionRateList);//설득률 리스트
 
 
         return "PersuasionBattleActivity";
@@ -165,9 +167,15 @@ public class PersuasionBattleController {
             @RequestParam("tfMismatch") boolean tfMismatch,
             @RequestParam("jpMismatch") boolean jpMismatch,
 
+            //라운드, 설득률, 논거 텍스트
+            @RequestParam("currentRound") int currentRound,
+            @RequestParam("persuasionRate") int persuasionRate,
+            @RequestParam("evidenceText") String evidenceText,
+
             @RequestParam(value = "battleList", required = false) List<String> battleList,
             @RequestParam(value = "dimension", required = false) String dimension,
 
+            @RequestParam(value = "persuasionRateList", required = false) List<Integer> persuasionRateList,
             // 다음 페이지로 데이터를 안전하게 전달하기 위한 객체
             RedirectAttributes redirectAttributes){
 
@@ -202,8 +210,13 @@ public class PersuasionBattleController {
         redirectAttributes.addAttribute("tfMismatch", tfMismatch);
         redirectAttributes.addAttribute("jpMismatch", jpMismatch);
 
+        redirectAttributes.addAttribute("currentRound", currentRound);
+        redirectAttributes.addAttribute("persuasionRate", persuasionRate);
+
         redirectAttributes.addFlashAttribute("battleList", battleList);
         redirectAttributes.addFlashAttribute("dimension", dimension);
+
+        redirectAttributes.addFlashAttribute("persuasionRateList", persuasionRateList);
 
         //다음 페이지 리다이렉션 주소
         return "redirect:/persuade/start";
