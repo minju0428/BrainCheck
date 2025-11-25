@@ -3,7 +3,9 @@ package com.example.braincheck.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -37,11 +39,35 @@ public class AiAnalysisService {
             String userTf = persuadeData.get("tf");
             String userJp = persuadeData.get("jp");
 
+            boolean eiMismatch = !userEi.equals(aiEi);
+            boolean snMismatch = !userSn.equals(aiSn);
+            boolean tfMismatch = !userTf.equals(aiTf);
+            boolean jpMismatch = !userJp.equals(aiJp);
+
             // AI MBTI와 사용자 선택 MBTI 비교 (불일치 여부 확인)
             processedData.put("eiMismatch", !userEi.equals(aiEi));
             processedData.put("snMismatch", !userSn.equals(aiSn));
             processedData.put("tfMismatch", !userTf.equals(aiTf));
             processedData.put("jpMismatch", !userJp.equals(aiJp));
+
+            List<String> battleList = new ArrayList<>();
+
+            //위에서 만든 변수가 true면 battleList에 저장
+            if (eiMismatch) {
+                battleList.add("EI");
+            }
+            if (snMismatch) {
+                battleList.add("SN");
+            }
+            if (tfMismatch) {
+                battleList.add("TF");
+            }
+            if (jpMismatch) {
+                battleList.add("JP");
+            }
+
+            // 생성된 리스트를 Map에 저장
+            processedData.put("battleList", battleList);
 
         } else {
             log.error("aiThing 데이터가 유효하지 않거나 4글자가 아닙니다: {}", aiThing);
