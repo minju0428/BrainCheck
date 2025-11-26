@@ -141,6 +141,7 @@ public class AiPromptService {
             return "에러 시 발생하는 메시지 적기" + e.getMessage();
         }
     }
+    //설득에 대한 답변, 설득률 받아오는 프롬포트 구현
 
 
 
