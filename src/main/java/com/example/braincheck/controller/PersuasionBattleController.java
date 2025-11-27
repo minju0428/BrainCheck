@@ -3,6 +3,7 @@ package com.example.braincheck.controller;
 
 import com.example.braincheck.service.PersuasionBattleRoundService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,12 @@ public class PersuasionBattleController {
     private static final List<String> AXIS_ORDER = Arrays.asList("EI", "SN", "TF", "JP");
 
     private final PersuasionBattleRoundService persuasionBattleRoundService;
+
+    @Autowired
+    public PersuasionBattleController(PersuasionBattleRoundService persuasionBattleRoundService) {
+        this.persuasionBattleRoundService = persuasionBattleRoundService;
+    }
+
     @GetMapping("/start")
     public String persuasionBattle(
             @RequestParam("ei") String ei,
@@ -64,6 +71,32 @@ public class PersuasionBattleController {
         List<String> aiFeedbackList = (List<String>) model.asMap().get("aiFeedbackList");
         @SuppressWarnings("unchecked")
         List<Integer> persuasionRateList = (List<Integer>) model.asMap().get("persuasionRateList");
+
+        // battleList가 null이면 초기화 (첫 진입 시)
+        if (battleList == null || battleList.isEmpty()) {
+            battleList = new ArrayList<>();
+            if (eiMismatch) battleList.add("EI");
+            if (snMismatch) battleList.add("SN");
+            if (tfMismatch) battleList.add("TF");
+            if (jpMismatch) battleList.add("JP");
+        }
+
+        // dimension이 null이면 첫 번째 불일치 차원으로 설정
+        if (dimension == null && !battleList.isEmpty()) {
+            dimension = battleList.get(0);
+        }
+
+        // 히스토리 리스트들이 null이면 초기화
+        if (userHistoryList == null) {
+            userHistoryList = new ArrayList<>();
+        }
+        if (aiFeedbackList == null) {
+            aiFeedbackList = new ArrayList<>();
+        }
+        if (persuasionRateList == null) {
+            persuasionRateList = new ArrayList<>();
+            persuasionRateList.add(0); // 초기 설득률 0
+        }
 
         log.info("=== AI 분석 결과 화면 수신 데이터 확인 ===");
         log.info("최종 MBTI: {}", fullMbti);
@@ -181,19 +214,39 @@ public class PersuasionBattleController {
             // 다음 페이지로 데이터를 안전하게 전달하기 위한 객체
             RedirectAttributes redirectAttributes){
 
-        Map<String, Object> nextStateData = new HashMap<>();
-        nextStateData.put("battleList", battleList);
-        nextStateData.put("dimension", dimension);
-        nextStateData.put("currentRound", currentRound);
-        nextStateData.put("persuasionRate", persuasionRate);
-        nextStateData.put("evidenceText", evidenceText);
+        // 현재 상태 데이터를 맵으로 준비
+        Map<String, Object> currentData = new HashMap<>();
+        currentData.put("battleList", battleList != null ? battleList : new ArrayList<>());
+        currentData.put("dimension", dimension);
+        currentData.put("currentRound", currentRound);
+        currentData.put("persuasionRate", persuasionRate);
+        currentData.put("evidenceText", evidenceText);
+        currentData.put("userHistoryList", userHistoryList != null ? userHistoryList : new ArrayList<>());
+        currentData.put("aiFeedbackList", aiFeedbackList != null ? aiFeedbackList : new ArrayList<>());
+        currentData.put("persuasionRateList", persuasionRateList != null ? persuasionRateList : new ArrayList<>());
 
+        // 서비스 호출하여 다음 라운드 데이터 가져오기
         Map<String, Object> nextStateData = persuasionBattleRoundService.processNextRound(currentData);
 
+        // 서비스에서 받은 결과 처리
         int nextRound = (Integer) nextStateData.get("currentRound");
         int newPersuasionRate = (Integer) nextStateData.get("persuasionRate");
         String nextDimension = (String) nextStateData.get("dimension");
         boolean isFinished = (Boolean) nextStateData.get("isFinished");
+
+        @SuppressWarnings("unchecked")
+        List<String> updatedBattleList = (List<String>) nextStateData.get("battleList");
+        @SuppressWarnings("unchecked")
+        List<String> updatedUserHistoryList = (List<String>) nextStateData.get("userHistoryList");
+        @SuppressWarnings("unchecked")
+        List<String> updatedAiFeedbackList = (List<String>) nextStateData.get("aiFeedbackList");
+        @SuppressWarnings("unchecked")
+        List<Integer> updatedPersuasionRateList = (List<Integer>) nextStateData.get("persuasionRateList");
+
+        log.info("=== 서비스 처리 후 결과 ===");
+        log.info("다음 라운드: {}, 새 설득률: {}", nextRound, newPersuasionRate);
+        log.info("다음 차원: {}, 완료 여부: {}", nextDimension, isFinished);
+
 
         if (isFinished) {
             //최종 결과 페이지로 가는 경로
