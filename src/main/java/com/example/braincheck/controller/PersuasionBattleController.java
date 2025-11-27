@@ -1,6 +1,7 @@
 package com.example.braincheck.controller;
 //처음 설득 페이지
 
+import com.example.braincheck.service.PersuasionBattleRoundService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +21,7 @@ public class PersuasionBattleController {
     // MBTI 설득 고정 순서
     private static final List<String> AXIS_ORDER = Arrays.asList("EI", "SN", "TF", "JP");
 
+    private final PersuasionBattleRoundService persuasionBattleRoundService;
     @GetMapping("/start")
     public String persuasionBattle(
             @RequestParam("ei") String ei,
@@ -178,6 +180,25 @@ public class PersuasionBattleController {
             @RequestParam(value = "persuasionRateList", required = false) List<Integer> persuasionRateList,
             // 다음 페이지로 데이터를 안전하게 전달하기 위한 객체
             RedirectAttributes redirectAttributes){
+
+        Map<String, Object> nextStateData = new HashMap<>();
+        nextStateData.put("battleList", battleList);
+        nextStateData.put("dimension", dimension);
+        nextStateData.put("currentRound", currentRound);
+        nextStateData.put("persuasionRate", persuasionRate);
+        nextStateData.put("evidenceText", evidenceText);
+
+        Map<String, Object> nextStateData = persuasionBattleRoundService.processNextRound(currentData);
+
+        int nextRound = (Integer) nextStateData.get("currentRound");
+        int newPersuasionRate = (Integer) nextStateData.get("persuasionRate");
+        String nextDimension = (String) nextStateData.get("dimension");
+        boolean isFinished = (Boolean) nextStateData.get("isFinished");
+
+        if (isFinished) {
+            //최종 결과 페이지로 가는 경로
+            //retrun "redirect:/persuade/final";
+        }
 
 
 
