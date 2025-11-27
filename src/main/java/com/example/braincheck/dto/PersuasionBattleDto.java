@@ -345,4 +345,6 @@ public class PersuasionBattleDto {
         this.persuasionRateList = persuasionRateList;
     }
 
+
+
 }
