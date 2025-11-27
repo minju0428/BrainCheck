@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MBTI 예측하기 - 설득 라운드</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --primary-purple: #a238ff;
+      --secondary-pink: #ff3ca6;
+      --bg-gradient: radial-gradient(circle at top left, #e0f2fe 0%, #f3e8ff 50%, #ffffff 100%);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+    }
+
+    .ui-card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      border: 1px solid #f3f4f6;
+    }
+
+    .info-card {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+    }
+
+    .progress-bar-container {
+      height: 8px;
+      background-color: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-purple), #ff84e8);
+      transition: width 0.5s ease-in-out;
+    }
+
+    .current-axis-card {
+      border: 1px solid #ff71c6;
+      background-color: #fef0ff;
+      position: relative;
+      padding: 1.5rem;
+    }
+    .target-icon {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      color: #ff71c6;
+    }
+    .axis-choice-card {
+      padding: 1rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      text-align: center;
+      cursor: pointer;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .axis-choice-card.selected {
+      background-color: #6C5CE7;
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(108, 92, 231, 0.4);
+    }
+
+    .axis-choice-card:not(.selected) {
+      color: #1A73E8;
+      background-color: #F0F8FF;
+      font-weight: 700;
+      border: 1px solid #C5E1A5;
+    }
+
+    .vs-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      flex-shrink: 0;
+    }
+
+    .persuasion-card {
+      background-color: #ffffff;
+      border: 1px solid #f3f4f6;
+    }
+    .persuasion-progress-fill {
+      height: 100%;
+      background: var(--primary-purple);
+      transition: width 0.5s ease-in-out;
+    }
+
+    .question-block {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f3f4f6;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .tip-block {
+      background-color: #f7f3ff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid #e0cffc;
+    }
+    .tip-list {
+      margin-top: 10px;
+      list-style: none;
+      padding-left: 0;
+      font-size: 0.95rem;
+      color: #4a5568;
+    }
+    .tip-list li {
+      margin-bottom: 8px;
+      position: relative;
+      padding-left: 15px;
+    }
+    .tip-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--primary-purple);
+      font-weight: bold;
+    }
+
+    .evidence-box {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f3f4f6;
+      padding: 1.5rem;
+    }
+    .evidence-textarea {
+      width: 100%;
+      min-height: 120px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px;
+      resize: vertical;
+      font-size: 0.95rem;
+      color: #4a5568;
+      transition: border-color 0.2s;
+    }
+    .evidence-textarea:focus {
+      outline: none;
+      border-color: var(--primary-purple);
+      box-shadow: 0 0 0 3px rgba(162, 56, 255, 0.2);
+    }
+    .submit-button {
+      background: linear-gradient(90deg, #b862ff, #ff71c6);
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 1.5rem;
+      border-radius: 9999px;
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .submit-button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body class="flex justify-center py-8 px-4">
+
+<div class="max-w-xl w-full text-left space-y-4">
+
+  <!-- 캐릭터 정보 카드 -->
+  <div class="ui-card info-card">
+    <div class="flex-grow">
+      <p class="text-lg font-bold text-gray-800" th:text="${characterName}">독고</p>
+      <p class="text-sm text-gray-500" th:text="${title}">불편한 편의점</p>
+    </div>
+
+    <div class="flex items-center space-x-2 text-sm font-semibold">
+      <span class="bg-purple-600 text-white px-3 py-1 rounded-full" th:text="|당신: ${fullMbti}|">당신: ESTJ</span>
+      <span class="bg-blue-600 text-white px-3 py-1 rounded-full" th:text="|AI: ${aiEi}${aiSn}${aiTf}${aiJp}|">AI: ISFJ</span>
+    </div>
+  </div>
+
+  <!-- 전체 진행도 카드 -->
+  <div class="ui-card space-y-3" th:with="
+            totalDimensions=${battleList != null ? battleList.size() : 0},
+            currentIndex=${battleList != null ? (battleList.indexOf(dimension) + 1) : 1},
+            progressPercent=${totalDimensions > 0 ? (currentIndex * 100.0 / totalDimensions) : 0}">
+
+    <div class="flex justify-between items-center text-gray-600">
+      <span class="font-semibold text-gray-800">전체 진행도</span>
+      <span class="text-sm" th:text="|${currentIndex} / ${totalDimensions} 차원|">1 / 4 차원</span>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-fill" th:style="|width: ${progressPercent}%;|"></div>
+    </div>
+
+    <div class="flex justify-between text-sm font-medium text-gray-500 pt-1">
+      <span>E/I</span>
+      <span>S/N</span>
+      <span>T/F</span>
+      <span>J/P</span>
+    </div>
+  </div>
+
+  <!-- 현재 설득 차원 카드 -->
+  <div class="ui-card current-axis-card space-y-4">
+    <i data-lucide="target" class="w-6 h-6 target-icon"></i>
+    <div class="pl-8">
+      <span class="text-base font-semibold text-gray-800">현재 설득 차원</span>
+      <h3 class="text-xl font-bold text-gray-900"
+          th:text="${dimension == 'EI' ? '에너지 방향 (E/I)' :
+                          (dimension == 'SN' ? '인식 방식 (S/N)' :
+                          (dimension == 'TF' ? '판단 기준 (T/F)' :
+                          (dimension == 'JP' ? '생활 양식 (J/P)' : '알 수 없음')))}">에너지 방향</h3>
+    </div>
+
+    <div class="flex items-center justify-center gap-3">
+      <!-- 사용자 선택 -->
+      <div class="axis-choice-card selected flex-1">
+        <span class="text-sm" th:text="|당신: ${dimension == 'EI' ? ei : (dimension == 'SN' ? sn : (dimension == 'TF' ? tf : jp))}|">당신: E</span>
+        <p class="text-base" th:text="${dimension == 'EI' ? (ei == 'E' ? '외향적' : '내향적') :
+                                                (dimension == 'SN' ? (sn == 'S' ? '감각적' : '직관적') :
+                                                (dimension == 'TF' ? (tf == 'T' ? '사고형' : '감정형') :
+                                                (dimension == 'JP' ? (jp == 'J' ? '판단형' : '인식형') : '')))}">외향적</p>
+      </div>
+
+      <div class="vs-text">VS</div>
+
+      <!-- AI 선택 -->
+      <div class="axis-choice-card flex-1">
+        <span class="text-sm" th:text="|AI: ${dimension == 'EI' ? aiEi : (dimension == 'SN' ? aiSn : (dimension == 'TF' ? aiTf : aiJp))}|">AI: I</span>
+        <p class="text-base" th:text="${dimension == 'EI' ? (aiEi == 'I' ? '내향적' : '외향적') :
+                                                (dimension == 'SN' ? (aiSn == 'N' ? '직관적' : '감각적') :
+                                                (dimension == 'TF' ? (aiTf == 'F' ? '감정형' : '사고형') :
+                                                (dimension == 'JP' ? (aiJp == 'P' ? '인식형' : '판단형') : '')))}">내향적</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 현재 차원 설득률 카드 -->
+  <div class="ui-card persuasion-card space-y-3">
+    <div class="flex justify-between items-center text-gray-600">
+      <span class="font-semibold text-gray-800">현재 차원 설득률</span>
+      <span class="text-sm" th:text="|${persuasionRate}%|">0%</span>
+      <span class="text-sm">
+                    <span class="ml-2 px-2 py-0.5 rounded-full border border-gray-300 text-gray-600"
+                          th:text="|라운드 ${currentRound}/3|">라운드 1/3</span>
+                </span>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="persuasion-progress-fill" th:style="|width: ${persuasionRate}%;|"></div>
+    </div>
+  </div>
+
+  <div class="space-y-4 pt-4">
+
+    <!-- 라운드 기록 및 AI 피드백 (이전 라운드가 있을 때만 표시) -->
+    <div th:if="${userHistoryList != null and !userHistoryList.isEmpty()}" class="ui-card space-y-3">
+      <h4 class="text-lg font-bold text-gray-800 border-b pb-2 mb-2">라운드 기록 및 AI 피드백</h4>
+      <div th:each="history, iterStat : ${userHistoryList}" class="pb-3 border-b last:border-b-0">
+        <p class="font-semibold text-purple-600 text-sm mb-1">
+          <span th:text="|라운드 ${iterStat.index + 1} (${persuasionRateList[iterStat.index + 1] - persuasionRateList[iterStat.index]}% 획득)|">라운드 1 (XX% 획득)</span>
+        </p>
+        <blockquote class="text-gray-700 italic border-l-4 border-purple-200 pl-3 py-1 bg-gray-50 rounded-r-md">
+          <span class="font-bold text-purple-800">당신의 논거:</span> <span th:text="${history}"></span>
+        </blockquote>
+        <div th:if="${iterStat.index < aiFeedbackList.size()}">
+          <p class="font-semibold text-blue-600 text-sm mt-2">AI 피드백:</p>
+          <p class="text-gray-700 text-sm" th:text="${aiFeedbackList[iterStat.index]}"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 질문 블록 -->
+    <div class="question-block">
+      <i data-lucide="message-circle" class="w-6 h-6 mr-3 mt-0.5 text-purple-500 fill-purple-100"></i>
+      <p class="text-gray-700 text-base leading-relaxed">
+                    <span th:text="|AI는 이 캐릭터가 ${dimension} 차원에서 ${dimension == 'EI' ? aiEi : (dimension == 'SN' ? aiSn : (dimension == 'TF' ? aiTf : aiJp))}라고 분석했습니다. 당신의 ${dimension == 'EI' ? ei : (dimension == 'SN' ? sn : (dimension == 'TF' ? tf : jp))} 분석이 더 정확한 이유를 증명하세요.|">
+                        AI는 이 캐릭터가 EI 차원에서 I라고 분석했습니다. 당신의 E 분석이 더 정확한 이유를 증명하세요.
+                    </span>
+      </p>
+    </div>
+
+    <!-- 설득 팁 블록 -->
+    <div class="tip-block">
+      <div class="flex items-center text-purple-700 font-bold mb-2">
+        <i data-lucide="lightbulb" class="w-5 h-5 mr-2 fill-purple-200"></i>
+        <span class="text-lg">설득 팁</span>
+      </div>
+      <ul class="tip-list">
+        <li>구체적인 장면을 언급하세요 (예: "3장에서 OOO가 XXX할 때...")</li>
+        <li>캐릭터의 대사나 행동을 근거로 제시하세요</li>
+        <li>논리적 연결고리를 명확히 하세요 ("왜냐하면...", "따라서...")</li>
+        <li>
+                        <span class="font-bold text-gray-800"
+                              th:text="${dimension == 'EI' ? 'E/I (에너지 방향)' :
+                                       (dimension == 'SN' ? 'S/N (인식 방식)' :
+                                       (dimension == 'TF' ? 'T/F (판단 기준)' :
+                                       (dimension == 'JP' ? 'J/P (생활 양식)' : '현재 차원')))}">
+                            E/I (에너지 방향)
+                        </span> 차원에 집중하세요
+        </li>
+      </ul>
+    </div>
+
+    <!-- 논거 제출 폼 -->
+    <form action="/persuade/submit" method="post" class="evidence-box space-y-4">
+
+      <!-- 기본 정보 hidden inputs -->
+      <input type="hidden" name="title" th:value="${title}">
+      <input type="hidden" name="characterName" th:value="${characterName}">
+      <input type="hidden" name="category" th:value="${category}">
+      <input type="hidden" name="aiThing" th:value="${aiThing}">
+      <input type="hidden" name="fullMbti" th:value="${fullMbti}">
+
+      <!-- AI MBTI hidden inputs -->
+      <input type="hidden" name="aiEi" th:value="${aiEi}">
+      <input type="hidden" name="aiSn" th:value="${aiSn}">
+      <input type="hidden" name="aiTf" th:value="${aiTf}">
+      <input type="hidden" name="aiJp" th:value="${aiJp}">
+
+      <!-- MBTI 값 hidden inputs -->
+      <input type="hidden" name="valueE" th:value="${valueE}">
+      <input type="hidden" name="valueI" th:value="${valueI}">
+      <input type="hidden" name="valueS" th:value="${valueS}">
+      <input type="hidden" name="valueN" th:value="${valueN}">
+      <input type="hidden" name="valueT" th:value="${valueT}">
+      <input type="hidden" name="valueF" th:value="${valueF}">
+      <input type="hidden" name="valueJ" th:value="${valueJ}">
+      <input type="hidden" name="valueP" th:value="${valueP}">
+
+      <!-- 사용자 MBTI hidden inputs -->
+      <input type="hidden" name="ei" th:value="${ei}">
+      <input type="hidden" name="sn" th:value="${sn}">
+      <input type="hidden" name="tf" th:value="${tf}">
+      <input type="hidden" name="jp" th:value="${jp}">
+
+      <!-- 불일치 여부 hidden inputs -->
+      <input type="hidden" name="eiMismatch" th:value="${eiMismatch}">
+      <input type="hidden" name="snMismatch" th:value="${snMismatch}">
+      <input type="hidden" name="tfMismatch" th:value="${tfMismatch}">
+      <input type="hidden" name="jpMismatch" th:value="${jpMismatch}">
+
+      <!-- 현재 상태 hidden inputs -->
+      <input type="hidden" name="currentRound" th:value="${currentRound}">
+      <input type="hidden" name="persuasionRate" th:value="${persuasionRate}">
+      <input type="hidden" name="dimension" th:value="${dimension}">
+
+      <!-- 리스트 데이터 hidden inputs -->
+      <input type="hidden" th:each="axis : ${battleList}" name="battleList" th:value="${axis}">
+      <input type="hidden" th:each="history : ${userHistoryList}" name="userHistoryList" th:value="${history}">
+      <input type="hidden" th:each="feedback : ${aiFeedbackList}" name="aiFeedbackList" th:value="${feedback}">
+      <input type="hidden" th:each="rate : ${persuasionRateList}" name="persuasionRateList" th:value="${rate}">
+
+      <div class="flex items-center text-gray-800 font-bold">
+        <i data-lucide="square" class="w-5 h-5 mr-2 text-gray-400"></i>
+        <span th:text="|근거 제시 (라운드 ${currentRound}/3)|">근거 제시 (라운드 1/3)</span>
+      </div>
+
+      <textarea
+              class="evidence-textarea"
+              th:placeholder="|${dimension}에 대해 작품 속 구체적인 장면, 대사, 행동을 근거로 당신의 분석이 올바른 이유를 설명하세요...&#10;&#10;예시: '독고는 작품에서 다른 사람들과 어울리며 에너지를 얻는 모습을 보여줍니다. 왜냐하면...'|"
+              name="evidenceText"
+              required
+      ></textarea>
+
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-gray-500 char-count">0자 (최소 50자 권장)</span>
+        <button type="submit" class="submit-button">
+          <i data-lucide="send" class="w-4 h-4 mr-1.5 transform rotate-45"></i>
+          논거 제출
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Lucide Icons 초기화
+  lucide.createIcons();
+
+  // 텍스트 카운트 및 버튼 활성화 로직
+  const textarea = document.querySelector('.evidence-textarea');
+  const charCount = document.querySelector('.char-count');
+  const submitButton = document.querySelector('.submit-button');
+  const MIN_LENGTH = 50;
+
+  if (textarea && charCount && submitButton) {
+    // 초기 버튼 비활성화
+    submitButton.disabled = true;
+    submitButton.style.opacity = '0.6';
+    submitButton.style.cursor = 'not-allowed';
+
+    textarea.addEventListener('input', () => {
+      const length = textarea.value.length;
+      charCount.textContent = `${length}자 (최소 ${MIN_LENGTH}자 권장)`;
+
+      if (length >= MIN_LENGTH) {
+        submitButton.style.opacity = '1';
+        submitButton.style.cursor = 'pointer';
+        submitButton.disabled = false;
+      } else {
+        submitButton.style.opacity = '0.6';
+        submitButton.style.cursor = 'not-allowed';
+        submitButton.disabled = true;
+      }
+    });
+  }
+</script>
+</body>
+</html>
