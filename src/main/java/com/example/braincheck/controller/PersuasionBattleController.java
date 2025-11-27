@@ -1,8 +1,12 @@
 package com.example.braincheck.controller;
 //처음 설득 페이지
 
-import com.example.braincheck.service.PersuasionBattleRoundService;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.*;
+import com.example.braincheck.service.PersuasionBattleRoundService;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
@@ -38,7 +44,7 @@ public class PersuasionBattleController {
             @RequestParam("title") String title,
             @RequestParam("characterName") String characterName,
             @RequestParam("category") String category,
-            @RequestParam("aiThing")  String aiThing,
+            @RequestParam("aiThing") String aiThing,
             @RequestParam("valueE") String valueE,
             @RequestParam("valueI") String valueI,
             @RequestParam("valueS") String valueS,
@@ -71,14 +77,24 @@ public class PersuasionBattleController {
         List<String> aiFeedbackList = (List<String>) model.asMap().get("aiFeedbackList");
         @SuppressWarnings("unchecked")
         List<Integer> persuasionRateList = (List<Integer>) model.asMap().get("persuasionRateList");
+        @SuppressWarnings("unchecked")
+        List<Integer> persuasionGainList = (List<Integer>) model.asMap().get("persuasionGainList");
 
         // battleList가 null이면 초기화 (첫 진입 시)
         if (battleList == null || battleList.isEmpty()) {
             battleList = new ArrayList<>();
-            if (eiMismatch) battleList.add("EI");
-            if (snMismatch) battleList.add("SN");
-            if (tfMismatch) battleList.add("TF");
-            if (jpMismatch) battleList.add("JP");
+            if (eiMismatch) {
+                battleList.add("EI");
+            }
+            if (snMismatch) {
+                battleList.add("SN");
+            }
+            if (tfMismatch) {
+                battleList.add("TF");
+            }
+            if (jpMismatch) {
+                battleList.add("JP");
+            }
         }
 
         // dimension이 null이면 첫 번째 불일치 차원으로 설정
@@ -96,6 +112,9 @@ public class PersuasionBattleController {
         if (persuasionRateList == null) {
             persuasionRateList = new ArrayList<>();
             persuasionRateList.add(0); // 초기 설득률 0
+        }
+        if (persuasionGainList == null) {
+            persuasionGainList = new ArrayList<>();
         }
 
         log.info("=== AI 분석 결과 화면 수신 데이터 확인 ===");
@@ -126,7 +145,6 @@ public class PersuasionBattleController {
         System.out.println("F (감정) 값: " + valueF);
         System.out.println("J (판단) 값: " + valueJ);
         System.out.println("P (인식) 값: " + valueP);
-
 
         //Model에 데이터 추가
         model.addAttribute("title", title);
@@ -167,7 +185,7 @@ public class PersuasionBattleController {
         model.addAttribute("userHistoryList", userHistoryList);
         model.addAttribute("aiFeedbackList", aiFeedbackList);
         model.addAttribute("persuasionRateList", persuasionRateList);//설득률 리스트
-
+        model.addAttribute("persuasionGainList", persuasionGainList);//라운드별 설득력 증가량
 
         return "PersuasionBattleActivity";
 
@@ -201,22 +219,30 @@ public class PersuasionBattleController {
             @RequestParam("snMismatch") boolean snMismatch,
             @RequestParam("tfMismatch") boolean tfMismatch,
             @RequestParam("jpMismatch") boolean jpMismatch,
-
             //라운드, 설득률, 논거 텍스트
             @RequestParam("currentRound") int currentRound,
             @RequestParam("persuasionRate") int persuasionRate,
             @RequestParam("evidenceText") String evidenceText,
-
             @RequestParam(value = "battleList", required = false) List<String> battleList,
             @RequestParam(value = "dimension", required = false) String dimension,
-
+            @RequestParam(value = "userHistoryList", required = false) List<String> userHistoryList,
+            @RequestParam(value = "aiFeedbackList", required = false) List<String> aiFeedbackList,
             @RequestParam(value = "persuasionRateList", required = false) List<Integer> persuasionRateList,
+            @RequestParam(value = "persuasionGainList", required = false) List<Integer> persuasionGainList,
             // 다음 페이지로 데이터를 안전하게 전달하기 위한 객체
-            RedirectAttributes redirectAttributes){
+            RedirectAttributes redirectAttributes) {
 
         // 현재 상태 데이터를 맵으로 준비
         Map<String, Object> currentData = new HashMap<>();
         currentData.put("battleList", battleList != null ? battleList : new ArrayList<>());
+
+        // AI 프롬프트용 메타데이터 (라운드 서비스에서 사용)
+        currentData.put("title", title);
+        currentData.put("characterName", characterName);
+        currentData.put("category", category);
+        currentData.put("fullMbti", fullMbti);  // 사용자 최종 MBTI
+        currentData.put("aiThing", aiThing);    // AI가 분석한 MBTI
+
         currentData.put("dimension", dimension);
         currentData.put("currentRound", currentRound);
         currentData.put("persuasionRate", persuasionRate);
@@ -224,6 +250,7 @@ public class PersuasionBattleController {
         currentData.put("userHistoryList", userHistoryList != null ? userHistoryList : new ArrayList<>());
         currentData.put("aiFeedbackList", aiFeedbackList != null ? aiFeedbackList : new ArrayList<>());
         currentData.put("persuasionRateList", persuasionRateList != null ? persuasionRateList : new ArrayList<>());
+        currentData.put("persuasionGainList", persuasionGainList != null ? persuasionGainList : new ArrayList<>());
 
         // 서비스 호출하여 다음 라운드 데이터 가져오기
         Map<String, Object> nextStateData = persuasionBattleRoundService.processNextRound(currentData);
@@ -242,19 +269,17 @@ public class PersuasionBattleController {
         List<String> updatedAiFeedbackList = (List<String>) nextStateData.get("aiFeedbackList");
         @SuppressWarnings("unchecked")
         List<Integer> updatedPersuasionRateList = (List<Integer>) nextStateData.get("persuasionRateList");
+        @SuppressWarnings("unchecked")
+        List<Integer> updatedPersuasionGainList = (List<Integer>) nextStateData.get("persuasionGainList");
 
         log.info("=== 서비스 처리 후 결과 ===");
         log.info("다음 라운드: {}, 새 설득률: {}", nextRound, newPersuasionRate);
         log.info("다음 차원: {}, 완료 여부: {}", nextDimension, isFinished);
 
-
         if (isFinished) {
             //최종 결과 페이지로 가는 경로
             //retrun "redirect:/persuade/final";
         }
-
-
-
 
         redirectAttributes.addAttribute("title", title);
         redirectAttributes.addAttribute("characterName", characterName);
@@ -277,31 +302,26 @@ public class PersuasionBattleController {
         redirectAttributes.addAttribute("tf", tf);
         redirectAttributes.addAttribute("jp", jp);
 
-
-
         redirectAttributes.addAttribute("eiMismatch", eiMismatch);
         redirectAttributes.addAttribute("snMismatch", snMismatch);
         redirectAttributes.addAttribute("tfMismatch", tfMismatch);
         redirectAttributes.addAttribute("jpMismatch", jpMismatch);
 
-        redirectAttributes.addAttribute("currentRound", currentRound);
-        redirectAttributes.addAttribute("persuasionRate", persuasionRate);
+        // 다음 라운드/차원 정보 전달
+        redirectAttributes.addAttribute("currentRound", nextRound);
+        redirectAttributes.addAttribute("persuasionRate", newPersuasionRate);
 
-        redirectAttributes.addFlashAttribute("battleList", battleList);
-        redirectAttributes.addFlashAttribute("dimension", dimension);
-
-        redirectAttributes.addFlashAttribute("persuasionRateList", persuasionRateList);
+        // 히스토리 및 차원 상태는 Flash Attribute로 전달
+        redirectAttributes.addFlashAttribute("battleList", updatedBattleList);
+        redirectAttributes.addFlashAttribute("dimension", nextDimension);
+        redirectAttributes.addFlashAttribute("userHistoryList", updatedUserHistoryList);
+        redirectAttributes.addFlashAttribute("aiFeedbackList", updatedAiFeedbackList);
+        redirectAttributes.addFlashAttribute("persuasionRateList", updatedPersuasionRateList);
+        redirectAttributes.addFlashAttribute("persuasionGainList", updatedPersuasionGainList);
 
         //다음 페이지 리다이렉션 주소
         return "redirect:/persuade/start";
 
-
     }
-
-
-
-
-
-
 
 }

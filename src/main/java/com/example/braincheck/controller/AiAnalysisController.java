@@ -244,7 +244,6 @@ public class AiAnalysisController {
 
         // 설득 대결 시작 페이지로 리다이렉트 (예시 경로: /persuade/start)
         //다음 경로로 고치기
-        //return "redirect:/persuade/start";
-        return  "redirect:/";
+        return "redirect:/persuade/start";
     }
 }
