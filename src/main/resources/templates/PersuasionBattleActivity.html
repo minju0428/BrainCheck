@@ -278,7 +278,12 @@
       <h4 class="text-lg font-bold text-gray-800 border-b pb-2 mb-2">라운드 기록 및 AI 피드백</h4>
       <div th:each="history, iterStat : ${userHistoryList}" class="pb-3 border-b last:border-b-0">
         <p class="font-semibold text-purple-600 text-sm mb-1">
-          <span th:text="|라운드 ${iterStat.index + 1} (${persuasionRateList[iterStat.index + 1] - persuasionRateList[iterStat.index]}% 획득)|">라운드 1 (XX% 획득)</span>
+          <span
+                  th:text="${persuasionGainList != null and iterStat.index &lt; #lists.size(persuasionGainList) 
+                           ? '라운드 ' + (iterStat.index + 1) + ' (' + persuasionGainList[iterStat.index] + '% 획득)'
+                           : '라운드 ' + (iterStat.index + 1)}">
+            라운드 1 (XX% 획득)
+          </span>
         </p>
         <blockquote class="text-gray-700 italic border-l-4 border-purple-200 pl-3 py-1 bg-gray-50 rounded-r-md">
           <span class="font-bold text-purple-800">당신의 논거:</span> <span th:text="${history}"></span>
