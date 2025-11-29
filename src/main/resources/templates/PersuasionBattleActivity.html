@@ -164,22 +164,6 @@
       border-color: var(--primary-purple);
       box-shadow: 0 0 0 3px rgba(162, 56, 255, 0.2);
     }
-
-    .chat-history {
-      max-height: 260px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .gain-badge {
-      font-size: 0.70rem;
-      background: #22c55e;
-      color: white;
-      padding: 0.15rem 0.5rem;
-      border-radius: 9999px;
-      font-weight: 600;
-      box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
-    }
     .submit-button {
       background: linear-gradient(90deg, #b862ff, #ff71c6);
       color: white;
@@ -289,37 +273,31 @@
 
   <div class="space-y-4 pt-4">
 
-    <!-- 라운드별 프롬프트 / 응답 대화 기록 (프롬프트 스타일 UI)
-         ※ 항상 'AI 답변이 존재하는 라운드'만 표시하기 위해 aiFeedbackList를 기준으로 반복 -->
-    <div th:if="${aiFeedbackList != null and !aiFeedbackList.isEmpty()}" class="ui-card space-y-4 chat-history">
-      <h4 class="text-lg font-bold text-gray-800 border-b pb-2 mb-2">AI와의 대화 기록</h4>
-
-      <div th:each="feedback, iterStat : ${aiFeedbackList}" class="space-y-2 pb-4 border-b last:border-b-0">
-        <p class="font-semibold text-purple-600 text-xs">
-          <span th:text="|라운드 ${iterStat.count}|">라운드 1</span>
+    <!-- 라운드 기록 및 AI 피드백 (이전 라운드가 있을 때만 표시) -->
+    <div th:if="${userHistoryList != null and !userHistoryList.isEmpty()}" class="ui-card space-y-3">
+      <h4 class="text-lg font-bold text-gray-800 border-b pb-2 mb-2">라운드 기록 및 AI 피드백</h4>
+      <div th:each="history, iterStat : ${userHistoryList}" class="pb-3 border-b last:border-b-0">
+        <p class="font-semibold text-purple-600 text-sm mb-1">
+          <span th:text="|라운드 ${iterStat.index + 1} (${persuasionRateList[iterStat.index + 1] - persuasionRateList[iterStat.index]}% 획득)|">라운드 1 (XX% 획득)</span>
         </p>
-
-        <!-- 사용자 프롬프트 -->
-        <div class="flex justify-end">
-          <div class="max-w-[80%] rounded-2xl rounded-br-sm bg-purple-600 text-white px-3 py-2 text-sm shadow-sm">
-            <div class="text-[11px] opacity-70 mb-0.5">당신</div>
-            <div th:text="${userHistoryList[iterStat.index]}">당신의 논거 텍스트</div>
-          </div>
-        </div>
-
-        <!-- 설득력 배지 -->
-        <div class="flex justify-end" th:if="${persuasionGainList != null and iterStat.index < persuasionGainList.size()}">
-          <span class="gain-badge" th:text="|+${persuasionGainList[iterStat.index]}% 설득력|">+22% 설득력</span>
-        </div>
-
-        <!-- AI 응답 -->
-        <div class="flex justify-start">
-          <div class="max-w-[80%] rounded-2xl rounded-bl-sm bg-gray-100 text-gray-800 px-3 py-2 text-sm shadow-sm border border-gray-200">
-            <div class="text-[11px] text-blue-600 font-semibold mb-0.5">AI</div>
-            <div th:text="${feedback}">AI 피드백 내용</div>
-          </div>
+        <blockquote class="text-gray-700 italic border-l-4 border-purple-200 pl-3 py-1 bg-gray-50 rounded-r-md">
+          <span class="font-bold text-purple-800">당신의 논거:</span> <span th:text="${history}"></span>
+        </blockquote>
+        <div th:if="${iterStat.index < aiFeedbackList.size()}">
+          <p class="font-semibold text-blue-600 text-sm mt-2">AI 피드백:</p>
+          <p class="text-gray-700 text-sm" th:text="${aiFeedbackList[iterStat.index]}"></p>
         </div>
       </div>
+    </div>
+
+    <!-- 질문 블록 -->
+    <div class="question-block">
+      <i data-lucide="message-circle" class="w-6 h-6 mr-3 mt-0.5 text-purple-500 fill-purple-100"></i>
+      <p class="text-gray-700 text-base leading-relaxed">
+                    <span th:text="|AI는 이 캐릭터가 ${dimension} 차원에서 ${dimension == 'EI' ? aiEi : (dimension == 'SN' ? aiSn : (dimension == 'TF' ? aiTf : aiJp))}라고 분석했습니다. 당신의 ${dimension == 'EI' ? ei : (dimension == 'SN' ? sn : (dimension == 'TF' ? tf : jp))} 분석이 더 정확한 이유를 증명하세요.|">
+                        AI는 이 캐릭터가 EI 차원에서 I라고 분석했습니다. 당신의 E 분석이 더 정확한 이유를 증명하세요.
+                    </span>
+      </p>
     </div>
 
     <!-- 설득 팁 블록 -->
@@ -392,7 +370,6 @@
       <input type="hidden" th:each="history : ${userHistoryList}" name="userHistoryList" th:value="${history}">
       <input type="hidden" th:each="feedback : ${aiFeedbackList}" name="aiFeedbackList" th:value="${feedback}">
       <input type="hidden" th:each="rate : ${persuasionRateList}" name="persuasionRateList" th:value="${rate}">
-      <input type="hidden" th:each="gain : ${persuasionGainList}" name="persuasionGainList" th:value="${gain}">
 
       <div class="flex items-center text-gray-800 font-bold">
         <i data-lucide="square" class="w-5 h-5 mr-2 text-gray-400"></i>
@@ -451,3 +428,4 @@
 </script>
 </body>
 </html>
+
