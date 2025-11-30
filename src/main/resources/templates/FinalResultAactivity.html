@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최종 결과 - 캐릭터 해석 검증</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 설득 라운드 페이지에서 가져온 커스텀 스타일 */
+        :root {
+            --primary-purple: #a238ff;
+            --secondary-pink: #ff3ca6;
+            --bg-gradient: radial-gradient(circle at top left, #e0f2fe 0%, #f3e8ff 50%, #ffffff 100%);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+        }
+
+        .ui-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            border: 1px solid #f3f4f6;
+        }
+
+        .info-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+        }
+
+        /* 설득 결과 요약 박스 스타일 */
+        .persuasion-summary-box {
+            background-color: #e0f2fe; /* 연한 파란색 배경 */
+            border-radius: 8px;
+            padding: 1rem;
+            font-weight: 500;
+            color: #1e40af; /* 진한 파란색 텍스트 */
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .persuasion-summary-box i {
+            color: #f59e0b; /* 전구 아이콘 색상 */
+            margin-right: 0.5rem;
+        }
+
+        /* 최종 결과 전용 스타일 */
+        .result-header {
+            text-align: center;
+            padding-bottom: 1rem;
+        }
+
+        /* MBTI 결과 태그 스타일 */
+        .mbti-tag-user {
+            background-color: #6C5CE7; /* 설득 라운드 선택 배경색 */
+            color: white;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+        .mbti-tag-ai {
+            background-color: #1A73E8; /* 설득 라운드 AI 배경색 */
+            color: white;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        /* 차원별 결과 카드 스타일 */
+        .dimension-result-card {
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* 불일치 (설득 성공) - 퍼플/핑크 계열 */
+        .mismatch-success {
+            background-color: #fef0ff; /* 연한 핑크/퍼플 */
+            border: 1px solid #ff71c6;
+        }
+        /* 일치 (완벽 일치) - 그린 계열 */
+        .match-perfect {
+            background-color: #f0fff8; /* 연한 민트/그린 */
+            border: 1px solid #68d391;
+        }
+
+        .persuasion-bar-container {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+
+        /* 설득 성공 바 (퍼플/핑크 그라데이션) */
+        .persuasion-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #b862ff, #ff71c6);
+            border-radius: 4px;
+        }
+        /* 완벽 일치 바 (그린) */
+        .match-fill {
+            height: 100%;
+            background-color: #68d391;
+            border-radius: 4px;
+        }
+
+        .result-icon {
+            font-size: 1.5rem;
+            width: 24px;
+            height: 24px;
+        }
+
+        .icon-check {
+            color: #28a745; /* 진한 녹색 */
+        }
+        .icon-cross {
+            color: #dc3545; /* 진한 빨강 */
+        }
+
+        /* AI 상세 분석 지표 스타일 */
+        .ai-analysis-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            border: 1px solid #f3f4f6;
+            margin-bottom: 1rem;
+        }
+        .ai-analysis-header {
+            font-weight: bold;
+            color: #6C5CE7;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .mbti-dim-tag {
+            color: white;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-align: center;
+            width: 32px; /* 태그 너비 고정 */
+        }
+        .tag-e, .tag-i, .tag-s, .tag-n, .tag-t, .tag-f, .tag-j, .tag-p {
+            background-color: #6C5CE7; /* 기본 퍼플 */
+        }
+        .tag-e, .tag-s, .tag-t, .tag-j {
+            background-color: #6C5CE7; /* 사용자측 퍼플 */
+        }
+        .tag-i, .tag-n, .tag-f, .tag-p {
+            background-color: #1A73E8; /* AI측 블루 */
+        }
+        .dim-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .dim-center {
+            flex-grow: 1;
+            text-align: center;
+            font-weight: 600;
+            color: #374151;
+            margin: 0 1rem;
+        }
+        .dim-bar-container {
+            height: 30px;
+            background-color: #f3f4f6;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            margin-top: 4px;
+        }
+        .dim-percent {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body class="flex justify-center py-8 px-4">
+
+<div class="max-w-xl w-full text-left space-y-4">
+
+    <div class="result-header">
+        <h3 class="text-xl font-bold text-gray-900">최종 결과</h3>
+        <p class="text-sm text-gray-500">당신의 캐릭터 해석(캐해력) 검증 결과입니다</p>
+    </div>
+
+    <div class="ui-card info-card mb-6">
+        <div class="flex items-center space-x-4">
+            <div class="flex-grow">
+                <p class="text-xl font-bold text-gray-800">독고</p>
+                <p class="text-sm text-gray-500">불편한 편의점</p>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-end space-y-1 text-xs">
+            <span class="mbti-tag-user">당신: ESTJ</span>
+            <span class="mbti-tag-ai">AI: ISFJ</span>
+        </div>
+    </div>
+
+    <div class="persuasion-summary-box">
+        <i data-lucide="sparkles" class="w-5 h-5 mr-2"></i>
+        <span>2개 차원에서 AI를 설득했습니다! <strong>평균 설득률: 96%</strong></span>
+    </div>
+
+    <div class="ui-card mb-6">
+        <h5 class="font-bold text-gray-800 mb-3">AI의 생각 변화</h5>
+        <div class="space-y-2 text-sm text-gray-700">
+            <div class="flex justify-between items-center">
+                <span>AI의 E 성향 <strong>91%</strong> 변화</span>
+                <span class="text-gray-500">I &rarr; E</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span>AI의 S 성향 <strong>0%</strong> 변화</span>
+                <span class="text-gray-500">S &rarr; S</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span>AI의 T 성향 <strong>100%</strong> 변화</span>
+                <span class="text-gray-500">F &rarr; T</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span>AI의 J 성향 <strong>0%</strong> 변화</span>
+                <span class="text-gray-500">J &rarr; J</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="ai-analysis-card">
+        <div class="ai-analysis-header">
+            <i data-lucide="line-chart" class="w-5 h-5 mr-2"></i>
+            AI 분석 상세 지표 (퍼센트)
+        </div>
+
+        <div class="dim-row">
+            <div class="mbti-dim-tag tag-e">E 외향</div>
+            <div class="dim-center">에너지의 방향성</div>
+            <div class="mbti-dim-tag tag-i">내향 I</div>
+        </div>
+        <div class="dim-bar-container mb-4">
+            <div class="dim-percent">
+                <span class="text-gray-400">5%</span>
+                <span class="text-green-600">96%</span>
+            </div>
+            <div class="dim-percent text-right">
+                <span class="text-green-600">4%</span>
+                <span class="text-gray-400">95%</span>
+            </div>
+        </div>
+
+        <div class="dim-row">
+            <div class="mbti-dim-tag tag-s">S 감각</div>
+            <div class="dim-center">인식 기능</div>
+            <div class="mbti-dim-tag tag-n">직관 N</div>
+        </div>
+        <div class="dim-bar-container mb-4">
+            <div class="dim-percent">
+                <span class="text-green-600">90%</span>
+                <span class="text-green-600">90%</span>
+            </div>
+            <div class="dim-percent text-right">
+                <span class="text-gray-400">10%</span>
+                <span class="text-gray-400">10%</span>
+            </div>
+        </div>
+
+        <div class="dim-row">
+            <div class="mbti-dim-tag tag-t">T 사고</div>
+            <div class="dim-center">판단 기능</div>
+            <div class="mbti-dim-tag tag-f">감정 F</div>
+        </div>
+        <div class="dim-bar-container mb-4">
+            <div class="dim-percent">
+                <span class="text-gray-400">5%</span>
+                <span class="text-green-600">100%</span>
+            </div>
+            <div class="dim-percent text-right">
+                <span class="text-green-600">0%</span>
+                <span class="text-gray-400">95%</span>
+            </div>
+        </div>
+
+        <div class="dim-row">
+            <div class="mbti-dim-tag tag-j">J 판단</div>
+            <div class="dim-center">생활 양식</div>
+            <div class="mbti-dim-tag tag-p">인식 P</div>
+        </div>
+        <div class="dim-bar-container">
+            <div class="dim-percent">
+                <span class="text-green-600">90%</span>
+                <span class="text-green-600">90%</span>
+            </div>
+            <div class="dim-percent text-right">
+                <span class="text-gray-400">10%</span>
+                <span class="text-gray-400">10%</span>
+            </div>
+        </div>
+
+        <p class="text-xs text-gray-500 mt-4 text-center">
+            * 왼/오: 초기 분석 퍼센트 &rarr; 설득 후 최종 퍼센트
+        </p>
+    </div>
+    <div class="flex items-center text-gray-600 font-bold mb-4">
+        <i data-lucide="zap" class="w-5 h-5 mr-2 text-purple-500"></i>
+        <h4 class="text-lg">차원별 대결 결과</h4>
+    </div>
+
+    <div class="dimension-result-card mismatch-success space-y-3">
+        <div class="flex justify-between items-center">
+            <span class="font-bold text-gray-800">에너지 방향</span>
+            <div class="flex items-center space-x-1 text-sm font-semibold">
+                <span class="text-purple-600">당신: E</span>
+                <i data-lucide="x" class="result-icon icon-cross"></i>
+                <span class="text-blue-600">AI: I</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <div class="persuasion-bar-container">
+                <div class="persuasion-fill" style="width: 91%;"></div>
+            </div>
+            <span class="text-sm font-bold text-gray-700 w-16 text-right">설득률 91%</span>
+        </div>
+
+        <div class="flex items-center text-sm font-semibold text-green-600 pt-1">
+            <i data-lucide="check-square" class="result-icon icon-check mr-1"></i>
+            설득력 있는 논거를 제시했습니다!
+        </div>
+    </div>
+
+    <div class="dimension-result-card match-perfect space-y-3">
+        <div class="flex justify-between items-center">
+            <span class="font-bold text-gray-800">인식 기능</span>
+            <div class="flex items-center space-x-1 text-sm font-semibold">
+                <span class="text-purple-600">당신: S</span>
+                <i data-lucide="check" class="result-icon icon-check"></i>
+                <span class="text-blue-600">AI: S</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <div class="persuasion-bar-container">
+                <div class="match-fill" style="width: 100%;"></div>
+            </div>
+            <span class="text-sm font-bold text-gray-700 w-16 text-right">완벽 일치</span>
+        </div>
+
+        <div class="flex items-center text-sm font-semibold text-green-600 pt-1">
+            <i data-lucide="check-square" class="result-icon icon-check mr-1"></i>
+            100% 일치
+        </div>
+    </div>
+
+    <div class="dimension-result-card mismatch-success space-y-3">
+        <div class="flex justify-between items-center">
+            <span class="font-bold text-gray-800">판단 기능</span>
+            <div class="flex items-center space-x-1 text-sm font-semibold">
+                <span class="text-purple-600">당신: T</span>
+                <i data-lucide="x" class="result-icon icon-cross"></i>
+                <span class="text-blue-600">AI: F</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <div class="persuasion-bar-container">
+                <div class="persuasion-fill" style="width: 100%;"></div>
+            </div>
+            <span class="text-sm font-bold text-gray-700 w-16 text-right">설득률 100%</span>
+        </div>
+
+        <div class="flex items-center text-sm font-semibold text-green-600 pt-1">
+            <i data-lucide="check-square" class="result-icon icon-check mr-1"></i>
+            설득력 있는 논거를 제시했습니다!
+        </div>
+    </div>
+
+    <div class="dimension-result-card match-perfect space-y-3">
+        <div class="flex justify-between items-center">
+            <span class="font-bold text-gray-800">생활 양식</span>
+            <div class="flex items-center space-x-1 text-sm font-semibold">
+                <span class="text-purple-600">당신: J</span>
+                <i data-lucide="check" class="result-icon icon-check"></i>
+                <span class="text-blue-600">AI: J</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <div class="persuasion-bar-container">
+                <div class="match-fill" style="width: 100%;"></div>
+            </div>
+            <span class="text-sm font-bold text-gray-700 w-16 text-right">완벽 일치</span>
+        </div>
+
+        <div class="flex items-center text-sm font-semibold text-green-600 pt-1">
+            <i data-lucide="check-square" class="result-icon icon-check mr-1"></i>
+            100% 일치
+        </div>
+    </div>
+</div>
+
+<script>
+    // Lucide Icons 초기화
+    lucide.createIcons();
+</script>
+</body>
+</html>
