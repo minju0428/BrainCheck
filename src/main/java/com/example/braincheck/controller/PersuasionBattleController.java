@@ -237,7 +237,8 @@ public class PersuasionBattleController {
             @RequestParam(value = "persuasionRateList", required = false) List<Integer> persuasionRateList,
             @RequestParam(value = "persuasionGainList", required = false) List<Integer> persuasionGainList,
             // 다음 페이지로 데이터를 안전하게 전달하기 위한 객체
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
         // 현재 상태 데이터를 맵으로 준비
         Map<String, Object> currentData = new HashMap<>();
@@ -259,6 +260,14 @@ public class PersuasionBattleController {
         currentData.put("persuasionRateList", persuasionRateList != null ? persuasionRateList : new ArrayList<>());
         currentData.put("persuasionGainList", persuasionGainList != null ? persuasionGainList : new ArrayList<>());
 
+        // Flash Attribute에서 차원별 설득률 Map 가져오기 (이전 차원의 설득률 유지)
+        @SuppressWarnings("unchecked")
+        Map<String, Integer> existingDimensionPersuasionRateMap = (Map<String, Integer>) model.asMap().get("dimensionPersuasionRateMap");
+        if (existingDimensionPersuasionRateMap == null) {
+            existingDimensionPersuasionRateMap = new HashMap<>();
+        }
+        currentData.put("dimensionPersuasionRateMap", existingDimensionPersuasionRateMap);
+
         // 서비스 호출하여 다음 라운드 데이터 가져오기
         Map<String, Object> nextStateData = persuasionBattleRoundService.processNextRound(currentData);
 
@@ -278,6 +287,8 @@ public class PersuasionBattleController {
         List<Integer> updatedPersuasionRateList = (List<Integer>) nextStateData.get("persuasionRateList");
         @SuppressWarnings("unchecked")
         List<Integer> updatedPersuasionGainList = (List<Integer>) nextStateData.get("persuasionGainList");
+        @SuppressWarnings("unchecked")
+        Map<String, Integer> updatedDimensionPersuasionRateMap = (Map<String, Integer>) nextStateData.get("dimensionPersuasionRateMap");
 
         log.info("=== 서비스 처리 후 결과 ===");
         log.info("다음 라운드: {}, 새 설득률: {}", nextRound, newPersuasionRate);
@@ -289,10 +300,32 @@ public class PersuasionBattleController {
         } else {
             log.warn("⚠️ updatedAiFeedbackList가 비어있습니다!");
         }
+        log.info("차원별 설득률 Map: {}", updatedDimensionPersuasionRateMap);
 
         if (isFinished) {
-            //최종 결과 페이지로 가는 경로
-            //retrun "redirect:/persuade/final";
+            // 최종 결과 페이지로 리다이렉트
+            redirectAttributes.addAttribute("title", title);
+            redirectAttributes.addAttribute("characterName", characterName);
+            redirectAttributes.addAttribute("category", category);
+            redirectAttributes.addAttribute("fullMbti", fullMbti);
+            redirectAttributes.addAttribute("aiThing", aiThing);
+            redirectAttributes.addAttribute("ei", ei);
+            redirectAttributes.addAttribute("sn", sn);
+            redirectAttributes.addAttribute("tf", tf);
+            redirectAttributes.addAttribute("jp", jp);
+            redirectAttributes.addAttribute("aiEi", aiEi);
+            redirectAttributes.addAttribute("aiSn", aiSn);
+            redirectAttributes.addAttribute("aiTf", aiTf);
+            redirectAttributes.addAttribute("aiJp", aiJp);
+            redirectAttributes.addAttribute("eiMismatch", eiMismatch);
+            redirectAttributes.addAttribute("snMismatch", snMismatch);
+            redirectAttributes.addAttribute("tfMismatch", tfMismatch);
+            redirectAttributes.addAttribute("jpMismatch", jpMismatch);
+
+            // 차원별 설득률 Map을 Flash Attribute로 전달
+            redirectAttributes.addFlashAttribute("dimensionPersuasionRateMap", updatedDimensionPersuasionRateMap);
+
+            return "redirect:/persuade/final";
         }
 
         redirectAttributes.addAttribute("title", title);
@@ -332,10 +365,114 @@ public class PersuasionBattleController {
         redirectAttributes.addFlashAttribute("aiFeedbackList", updatedAiFeedbackList);
         redirectAttributes.addFlashAttribute("persuasionRateList", updatedPersuasionRateList);
         redirectAttributes.addFlashAttribute("persuasionGainList", updatedPersuasionGainList);
+        redirectAttributes.addFlashAttribute("dimensionPersuasionRateMap", updatedDimensionPersuasionRateMap);
 
         //다음 페이지 리다이렉션 주소
         return "redirect:/persuade/start";
 
+    }
+
+    @GetMapping("/final")
+    public String finalResult(
+            @RequestParam("title") String title,
+            @RequestParam("characterName") String characterName,
+            @RequestParam("category") String category,
+            @RequestParam("fullMbti") String fullMbti,
+            @RequestParam("aiThing") String aiThing,
+            @RequestParam("ei") String ei,
+            @RequestParam("sn") String sn,
+            @RequestParam("tf") String tf,
+            @RequestParam("jp") String jp,
+            @RequestParam("aiEi") String aiEi,
+            @RequestParam("aiSn") String aiSn,
+            @RequestParam("aiTf") String aiTf,
+            @RequestParam("aiJp") String aiJp,
+            @RequestParam("eiMismatch") boolean eiMismatch,
+            @RequestParam("snMismatch") boolean snMismatch,
+            @RequestParam("tfMismatch") boolean tfMismatch,
+            @RequestParam("jpMismatch") boolean jpMismatch,
+            Model model) {
+
+        // Flash Attribute에서 차원별 설득률 Map 가져오기
+        @SuppressWarnings("unchecked")
+        Map<String, Integer> dimensionPersuasionRateMap = (Map<String, Integer>) model.asMap().get("dimensionPersuasionRateMap");
+
+        if (dimensionPersuasionRateMap == null) {
+            dimensionPersuasionRateMap = new HashMap<>();
+        }
+
+        // 차원별 설득률 계산 (불일치한 차원만)
+        int eiPersuasionRate = eiMismatch ? dimensionPersuasionRateMap.getOrDefault("EI", 0) : 100;
+        int snPersuasionRate = snMismatch ? dimensionPersuasionRateMap.getOrDefault("SN", 0) : 100;
+        int tfPersuasionRate = tfMismatch ? dimensionPersuasionRateMap.getOrDefault("TF", 0) : 100;
+        int jpPersuasionRate = jpMismatch ? dimensionPersuasionRateMap.getOrDefault("JP", 0) : 100;
+
+        // 평균 설득률 계산
+        int totalRate = 0;
+        int count = 0;
+        if (eiMismatch) {
+            totalRate += eiPersuasionRate;
+            count++;
+        }
+        if (snMismatch) {
+            totalRate += snPersuasionRate;
+            count++;
+        }
+        if (tfMismatch) {
+            totalRate += tfPersuasionRate;
+            count++;
+        }
+        if (jpMismatch) {
+            totalRate += jpPersuasionRate;
+            count++;
+        }
+        int averagePersuasionRate = count > 0 ? totalRate / count : 100;
+
+        // 설득한 차원 개수 계산
+        int persuadedDimensions = 0;
+        if (eiMismatch && eiPersuasionRate > 0) {
+            persuadedDimensions++;
+        }
+        if (snMismatch && snPersuasionRate > 0) {
+            persuadedDimensions++;
+        }
+        if (tfMismatch && tfPersuasionRate > 0) {
+            persuadedDimensions++;
+        }
+        if (jpMismatch && jpPersuasionRate > 0) {
+            persuadedDimensions++;
+        }
+
+        // 모델에 데이터 추가
+        model.addAttribute("title", title);
+        model.addAttribute("characterName", characterName);
+        model.addAttribute("category", category);
+        model.addAttribute("fullMbti", fullMbti);
+        model.addAttribute("aiThing", aiThing);
+        model.addAttribute("ei", ei);
+        model.addAttribute("sn", sn);
+        model.addAttribute("tf", tf);
+        model.addAttribute("jp", jp);
+        model.addAttribute("aiEi", aiEi);
+        model.addAttribute("aiSn", aiSn);
+        model.addAttribute("aiTf", aiTf);
+        model.addAttribute("aiJp", aiJp);
+        model.addAttribute("eiMismatch", eiMismatch);
+        model.addAttribute("snMismatch", snMismatch);
+        model.addAttribute("tfMismatch", tfMismatch);
+        model.addAttribute("jpMismatch", jpMismatch);
+        model.addAttribute("eiPersuasionRate", eiPersuasionRate);
+        model.addAttribute("snPersuasionRate", snPersuasionRate);
+        model.addAttribute("tfPersuasionRate", tfPersuasionRate);
+        model.addAttribute("jpPersuasionRate", jpPersuasionRate);
+        model.addAttribute("averagePersuasionRate", averagePersuasionRate);
+        model.addAttribute("persuadedDimensions", persuadedDimensions);
+
+        log.info("=== 최종 결과 페이지 ===");
+        log.info("차원별 설득률: EI={}, SN={}, TF={}, JP={}", eiPersuasionRate, snPersuasionRate, tfPersuasionRate, jpPersuasionRate);
+        log.info("평균 설득률: {}, 설득한 차원: {}", averagePersuasionRate, persuadedDimensions);
+
+        return "FinalResultAactivity";
     }
 
 }

@@ -49,6 +49,10 @@ public class PersuasionBattleRoundService {
         @SuppressWarnings("unchecked")
         List<Integer> persuasionGainList = (List<Integer>) currentData.getOrDefault("persuasionGainList", new ArrayList<>());
 
+        // 차원별 최종 설득률을 저장하는 Map (결과 페이지에서 사용)
+        @SuppressWarnings("unchecked")
+        Map<String, Integer> dimensionPersuasionRateMap = (Map<String, Integer>) currentData.getOrDefault("dimensionPersuasionRateMap", new HashMap<>());
+
         // 3라운드는 마지막 라운드이므로 AI 피드백을 받지 않음
         int scoreGained = 0;
         String feedback = "";
@@ -111,6 +115,10 @@ public class PersuasionBattleRoundService {
         // 3라운드 (최대 라운드)를 초과하거나 설득률이 100%에 도달했을 때 또는 차원 전환을 시도
         if (nextRound > 3 || newPersuasionRate >= 100) {
 
+            // 현재 차원의 최종 설득률을 Map에 저장 (결과 페이지에서 사용)
+            dimensionPersuasionRateMap.put(dimension, newPersuasionRate);
+            log.info("차원 {}의 최종 설득률 {} 저장", dimension, newPersuasionRate);
+
             // 현재 차원 (dimension)을 battleList에서 제거
             battleList.remove(dimension);
 
@@ -156,6 +164,7 @@ public class PersuasionBattleRoundService {
         nextStateData.put("aiFeedbackList", aiFeedbackList);
         nextStateData.put("persuasionRateList", persuasionRateList);
         nextStateData.put("persuasionGainList", persuasionGainList);
+        nextStateData.put("dimensionPersuasionRateMap", dimensionPersuasionRateMap);
         nextStateData.put("isFinished", isFinished);
 
         return nextStateData;
