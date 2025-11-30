@@ -123,6 +123,13 @@ public class PersuasionBattleController {
 
         log.info("불일치 지표 리스트 (battleList): {}", battleList);
         log.info("현재 설득할 차원 (dimension): {}", dimension);
+        log.info("userHistoryList 크기: {}, 내용: {}", userHistoryList.size(), userHistoryList);
+        log.info("aiFeedbackList 크기: {}, 내용: {}", aiFeedbackList.size(), aiFeedbackList);
+        if (!aiFeedbackList.isEmpty()) {
+            log.info("마지막 AI 피드백: [{}]", aiFeedbackList.get(aiFeedbackList.size() - 1));
+        } else {
+            log.warn("⚠️ aiFeedbackList가 비어있습니다!");
+        }
 
         System.out.println("--- 사용자 MBTI 유형 선택 ---");
         System.out.println("E/I 유형: " + ei);
@@ -275,6 +282,13 @@ public class PersuasionBattleController {
         log.info("=== 서비스 처리 후 결과 ===");
         log.info("다음 라운드: {}, 새 설득률: {}", nextRound, newPersuasionRate);
         log.info("다음 차원: {}, 완료 여부: {}", nextDimension, isFinished);
+        log.info("userHistoryList 크기: {}, 내용: {}", updatedUserHistoryList.size(), updatedUserHistoryList);
+        log.info("aiFeedbackList 크기: {}, 내용: {}", updatedAiFeedbackList.size(), updatedAiFeedbackList);
+        if (!updatedAiFeedbackList.isEmpty()) {
+            log.info("마지막 AI 피드백: [{}]", updatedAiFeedbackList.get(updatedAiFeedbackList.size() - 1));
+        } else {
+            log.warn("⚠️ updatedAiFeedbackList가 비어있습니다!");
+        }
 
         if (isFinished) {
             //최종 결과 페이지로 가는 경로
