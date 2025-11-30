@@ -49,44 +49,59 @@ public class PersuasionBattleRoundService {
         @SuppressWarnings("unchecked")
         List<Integer> persuasionGainList = (List<Integer>) currentData.getOrDefault("persuasionGainList", new ArrayList<>());
 
-        // 1. AI 프롬프트 서비스 호출 (AI에게 현재 라운드의 논거를 분석 요청)
-        // 이전 라운드 설득문도 함께 전달 (현재 라운드의 evidenceText는 아직 리스트에 추가되지 않았으므로 userHistoryList가 이전 라운드들임)
-        String aiResponseText = aiPromptService.analyzePersuasionEvidence(
-                characterName,
-                title,
-                category,
-                dimension,
-                userMbtiType,
-                aiMbtiType,
-                evidenceText,
-                currentRound,
-                userHistoryList // 이전 라운드 설득문 리스트 전달
-        );
+        // 3라운드는 마지막 라운드이므로 AI 피드백을 받지 않음
+        int scoreGained = 0;
+        String feedback = "";
 
-        // 2. AI 응답 파싱 (Score, Feedback 추출)
-        log.info("=== AI 원본 응답 ===");
-        log.info("{}", aiResponseText);
-        log.info("==================");
+        if (currentRound < 3) {
+            // 1-2라운드: AI 프롬프트 서비스 호출 (AI에게 현재 라운드의 논거를 분석 요청)
+            // 이전 라운드 설득문도 함께 전달 (현재 라운드의 evidenceText는 아직 리스트에 추가되지 않았으므로 userHistoryList가 이전 라운드들임)
+            String aiResponseText = aiPromptService.analyzePersuasionEvidence(
+                    characterName,
+                    title,
+                    category,
+                    dimension,
+                    userMbtiType,
+                    aiMbtiType,
+                    evidenceText,
+                    currentRound,
+                    userHistoryList // 이전 라운드 설득문 리스트 전달
+            );
 
-        AiRoundResult aiRoundResult = parseAiPersuasionResponse(aiResponseText);
+            // 2. AI 응답 파싱 (Score, Feedback 추출)
+            log.info("=== AI 원본 응답 ===");
+            log.info("{}", aiResponseText);
+            log.info("==================");
 
-        log.info("=== 파싱 결과 ===");
-        log.info("Score: {}, Feedback: [{}]", aiRoundResult.getScore(), aiRoundResult.getFeedback());
-        log.info("================");
+            AiRoundResult aiRoundResult = parseAiPersuasionResponse(aiResponseText);
+
+            log.info("=== 파싱 결과 ===");
+            log.info("Score: {}, Feedback: [{}]", aiRoundResult.getScore(), aiRoundResult.getFeedback());
+            log.info("================");
+
+            scoreGained = aiRoundResult.getScore();
+            feedback = aiRoundResult.getFeedback();
+        } else {
+            // 3라운드: AI 피드백 없이 설득문만 저장
+            log.info("3라운드 (마지막 라운드)이므로 AI 피드백을 받지 않습니다.");
+        }
 
         // 3. 설득 기록 리스트에 저장
         userHistoryList.add(evidenceText);
-        String feedback = aiRoundResult.getFeedback();
-        aiFeedbackList.add(feedback);
+        if (!feedback.isEmpty()) {
+            aiFeedbackList.add(feedback);
+        }
 
-        log.info("리스트에 추가 완료. userHistoryList 크기: {}, aiFeedbackList 크기: {}, 추가된 피드백: [{}]",
-                userHistoryList.size(), aiFeedbackList.size(), feedback);
+        log.info("리스트에 추가 완료. userHistoryList 크기: {}, aiFeedbackList 크기: {}",
+                userHistoryList.size(), aiFeedbackList.size());
 
         // 4. 설득률 업데이트 (누적, 최대 100까지)
-        int scoreGained = aiRoundResult.getScore();
+        // 3라운드는 scoreGained가 0이므로 설득률이 증가하지 않음
         int newPersuasionRate = Math.min(100, persuasionRate + scoreGained);
         persuasionRateList.add(newPersuasionRate);
-        persuasionGainList.add(scoreGained);
+        if (scoreGained > 0) {
+            persuasionGainList.add(scoreGained);
+        }
 
         int nextRound = currentRound + 1;
         String nextDimension = dimension;
