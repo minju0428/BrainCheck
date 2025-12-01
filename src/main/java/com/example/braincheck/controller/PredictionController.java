@@ -121,7 +121,7 @@ public class PredictionController {
         response.put("valueF", valueF);
         response.put("valueJ", valueJ);
         response.put("valueP", valueP);
-        response.put("nextUrl", nextUrl); // 💡 클라이언트가 이동할 URL 정보 제공
+        response.put("nextUrl", nextUrl); //클라이언트가 이동할 URL 정보
 
         // Map을 JSON 형태로 반환
         return response;
@@ -169,7 +169,7 @@ public class PredictionController {
                 .queryParam("valueJ", valueJ)
                 .queryParam("valueP", valueP)
                 .build()
-                .encode() // ⭐️ 필수: URI 인코딩 수행
+                .encode() //URI 인코딩 수행
                 .toUriString();
 
         // 리다이렉션 후 수신된 데이터 확인

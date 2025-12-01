@@ -293,9 +293,9 @@ public class PersuasionBattleController {
         Map<String, Integer> existingDimensionPersuasionRateMap = (Map<String, Integer>) session.getAttribute("dimensionPersuasionRateMap");
         if (existingDimensionPersuasionRateMap == null) {
             existingDimensionPersuasionRateMap = new HashMap<>();
-            log.warn("⚠️ POST 요청: 세션에서 dimensionPersuasionRateMap을 찾을 수 없습니다. 새로 생성합니다.");
+            log.warn("POST 요청: 세션에서 dimensionPersuasionRateMap을 찾을 수 없습니다. 새로 생성합니다.");
         } else {
-            log.info("✅ POST 요청: 세션에서 dimensionPersuasionRateMap을 가져왔습니다. 크기: {}, 내용: {}", 
+            log.info("POST 요청: 세션에서 dimensionPersuasionRateMap을 가져왔습니다. 크기: {}, 내용: {}",
                     existingDimensionPersuasionRateMap.size(), existingDimensionPersuasionRateMap);
         }
         currentData.put("dimensionPersuasionRateMap", existingDimensionPersuasionRateMap);
@@ -305,9 +305,9 @@ public class PersuasionBattleController {
         Map<String, List<Integer>> existingDimensionRoundRateMap = (Map<String, List<Integer>>) session.getAttribute("dimensionRoundRateMap");
         if (existingDimensionRoundRateMap == null) {
             existingDimensionRoundRateMap = new HashMap<>();
-            log.warn("⚠️ POST 요청: 세션에서 dimensionRoundRateMap을 찾을 수 없습니다. 새로 생성합니다.");
+            log.warn("POST 요청: 세션에서 dimensionRoundRateMap을 찾을 수 없습니다. 새로 생성합니다.");
         } else {
-            log.info("✅ POST 요청: 세션에서 dimensionRoundRateMap을 가져왔습니다. 크기: {}, 내용: {}", 
+            log.info("POST 요청: 세션에서 dimensionRoundRateMap을 가져왔습니다. 크기: {}, 내용: {}",
                     existingDimensionRoundRateMap.size(), existingDimensionRoundRateMap);
             existingDimensionRoundRateMap.forEach((dim, rates) -> 
                 log.info("  - 차원 {}: 라운드별 설득률 {}", dim, rates)
@@ -352,7 +352,7 @@ public class PersuasionBattleController {
         if (!updatedAiFeedbackList.isEmpty()) {
             log.info("마지막 AI 피드백: [{}]", updatedAiFeedbackList.get(updatedAiFeedbackList.size() - 1));
         } else {
-            log.warn("⚠️ updatedAiFeedbackList가 비어있습니다!");
+            log.warn("updatedAiFeedbackList가 비어있습니다!");
         }
         log.info("차원별 설득률 Map: {}", updatedDimensionPersuasionRateMap);
         log.info("차원별 라운드별 설득률 Map: {}", updatedDimensionRoundRateMap);
@@ -365,14 +365,14 @@ public class PersuasionBattleController {
         // 세션에 업데이트된 Map 저장 (다음 요청에서 사용)
         session.setAttribute("dimensionPersuasionRateMap", updatedDimensionPersuasionRateMap);
         session.setAttribute("dimensionRoundRateMap", updatedDimensionRoundRateMap);
-        log.info("✅ 세션에 차원별 설득률 Map 저장 완료");
+        log.info("세션에 차원별 설득률 Map 저장 완료");
         
         // Map이 null이거나 비어있는 경우 경고
         if (updatedDimensionPersuasionRateMap == null || updatedDimensionPersuasionRateMap.isEmpty()) {
-            log.warn("⚠️ 차원별 설득률 Map이 비어있습니다! 모든 차원의 설득률이 저장되지 않았을 수 있습니다.");
+            log.warn("차원별 설득률 Map이 비어있습니다! 모든 차원의 설득률이 저장되지 않았을 수 있습니다.");
         }
         if (updatedDimensionRoundRateMap == null || updatedDimensionRoundRateMap.isEmpty()) {
-            log.warn("⚠️ 차원별 라운드별 설득률 Map이 비어있습니다! 모든 차원의 라운드별 설득률이 저장되지 않았을 수 있습니다.");
+            log.warn("차원별 라운드별 설득률 Map이 비어있습니다! 모든 차원의 라운드별 설득률이 저장되지 않았을 수 있습니다.");
         }
 
         if (isFinished) {
@@ -490,9 +490,9 @@ public class PersuasionBattleController {
         Map<String, Integer> dimensionPersuasionRateMap = (Map<String, Integer>) session.getAttribute("dimensionPersuasionRateMap");
         if (dimensionPersuasionRateMap == null) {
             dimensionPersuasionRateMap = new HashMap<>();
-            log.warn("⚠️ 최종 결과 페이지: 세션에서 dimensionPersuasionRateMap을 찾을 수 없습니다. 새로 생성합니다.");
+            log.warn("최종 결과 페이지: 세션에서 dimensionPersuasionRateMap을 찾을 수 없습니다. 새로 생성합니다.");
         } else {
-            log.info("✅ 최종 결과 페이지: 세션에서 dimensionPersuasionRateMap을 가져왔습니다. 크기: {}, 내용: {}", 
+            log.info("최종 결과 페이지: 세션에서 dimensionPersuasionRateMap을 가져왔습니다. 크기: {}, 내용: {}",
                     dimensionPersuasionRateMap.size(), dimensionPersuasionRateMap);
         }
         
@@ -501,9 +501,9 @@ public class PersuasionBattleController {
         Map<String, List<Integer>> dimensionRoundRateMap = (Map<String, List<Integer>>) session.getAttribute("dimensionRoundRateMap");
         if (dimensionRoundRateMap == null) {
             dimensionRoundRateMap = new HashMap<>();
-            log.warn("⚠️ 최종 결과 페이지: 세션에서 dimensionRoundRateMap을 찾을 수 없습니다. 새로 생성합니다.");
+            log.warn("최종 결과 페이지: 세션에서 dimensionRoundRateMap을 찾을 수 없습니다. 새로 생성합니다.");
         } else {
-            log.info("✅ 최종 결과 페이지: 세션에서 dimensionRoundRateMap을 가져왔습니다. 크기: {}, 내용: {}", 
+            log.info("최종 결과 페이지: 세션에서 dimensionRoundRateMap을 가져왔습니다. 크기: {}, 내용: {}",
                     dimensionRoundRateMap.size(), dimensionRoundRateMap);
             dimensionRoundRateMap.forEach((dim, rates) -> 
                 log.info("  - 차원 {}: 라운드별 설득률 {}", dim, rates)
