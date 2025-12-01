@@ -390,6 +390,14 @@ public class PersuasionBattleController {
             redirectAttributes.addAttribute("aiSn", aiSn);
             redirectAttributes.addAttribute("aiTf", aiTf);
             redirectAttributes.addAttribute("aiJp", aiJp);
+            redirectAttributes.addAttribute("valueE", valueE);
+            redirectAttributes.addAttribute("valueI", valueI);
+            redirectAttributes.addAttribute("valueS", valueS);
+            redirectAttributes.addAttribute("valueN", valueN);
+            redirectAttributes.addAttribute("valueT", valueT);
+            redirectAttributes.addAttribute("valueF", valueF);
+            redirectAttributes.addAttribute("valueJ", valueJ);
+            redirectAttributes.addAttribute("valueP", valueP);
             redirectAttributes.addAttribute("eiMismatch", eiMismatch);
             redirectAttributes.addAttribute("snMismatch", snMismatch);
             redirectAttributes.addAttribute("tfMismatch", tfMismatch);
@@ -462,6 +470,14 @@ public class PersuasionBattleController {
             @RequestParam("aiSn") String aiSn,
             @RequestParam("aiTf") String aiTf,
             @RequestParam("aiJp") String aiJp,
+            @RequestParam("valueE") String valueE,
+            @RequestParam("valueI") String valueI,
+            @RequestParam("valueS") String valueS,
+            @RequestParam("valueN") String valueN,
+            @RequestParam("valueT") String valueT,
+            @RequestParam("valueF") String valueF,
+            @RequestParam("valueJ") String valueJ,
+            @RequestParam("valueP") String valueP,
             @RequestParam("eiMismatch") boolean eiMismatch,
             @RequestParam("snMismatch") boolean snMismatch,
             @RequestParam("tfMismatch") boolean tfMismatch,
@@ -584,6 +600,109 @@ public class PersuasionBattleController {
         model.addAttribute("snRoundRates", snRoundRates);
         model.addAttribute("tfRoundRates", tfRoundRates);
         model.addAttribute("jpRoundRates", jpRoundRates);
+        
+        // 설득을 시도한 차원인지 확인 (dimensionPersuasionRateMap에 있는 차원만)
+        boolean eiPersuaded = dimensionPersuasionRateMap.containsKey("EI");
+        boolean snPersuaded = dimensionPersuasionRateMap.containsKey("SN");
+        boolean tfPersuaded = dimensionPersuasionRateMap.containsKey("TF");
+        boolean jpPersuaded = dimensionPersuasionRateMap.containsKey("JP");
+        
+        model.addAttribute("eiPersuaded", eiPersuaded);
+        model.addAttribute("snPersuaded", snPersuaded);
+        model.addAttribute("tfPersuaded", tfPersuaded);
+        model.addAttribute("jpPersuaded", jpPersuaded);
+        
+        // 초기 퍼센트 값 추가
+        model.addAttribute("valueE", valueE);
+        model.addAttribute("valueI", valueI);
+        model.addAttribute("valueS", valueS);
+        model.addAttribute("valueN", valueN);
+        model.addAttribute("valueT", valueT);
+        model.addAttribute("valueF", valueF);
+        model.addAttribute("valueJ", valueJ);
+        model.addAttribute("valueP", valueP);
+        
+        // 설득률에 따라 최종 퍼센트 계산
+        // EI 차원
+        int initialE = Integer.parseInt(valueE);
+        int initialI = Integer.parseInt(valueI);
+        int finalE, finalI;
+        if (eiMismatch && ei.equals("E")) {
+            // 사용자가 E를 선택했고, 설득률에 따라 E 방향으로 이동
+            int change = (int) Math.round((100 - initialE) * eiPersuasionRate / 100.0);
+            finalE = Math.min(100, initialE + change);
+            finalI = 100 - finalE;
+        } else if (eiMismatch && ei.equals("I")) {
+            // 사용자가 I를 선택했고, 설득률에 따라 I 방향으로 이동
+            int change = (int) Math.round((100 - initialI) * eiPersuasionRate / 100.0);
+            finalI = Math.min(100, initialI + change);
+            finalE = 100 - finalI;
+        } else {
+            // 일치하거나 설득하지 않은 경우 초기값 유지
+            finalE = initialE;
+            finalI = initialI;
+        }
+        
+        // SN 차원
+        int initialS = Integer.parseInt(valueS);
+        int initialN = Integer.parseInt(valueN);
+        int finalS, finalN;
+        if (snMismatch && sn.equals("S")) {
+            int change = (int) Math.round((100 - initialS) * snPersuasionRate / 100.0);
+            finalS = Math.min(100, initialS + change);
+            finalN = 100 - finalS;
+        } else if (snMismatch && sn.equals("N")) {
+            int change = (int) Math.round((100 - initialN) * snPersuasionRate / 100.0);
+            finalN = Math.min(100, initialN + change);
+            finalS = 100 - finalN;
+        } else {
+            finalS = initialS;
+            finalN = initialN;
+        }
+        
+        // TF 차원
+        int initialT = Integer.parseInt(valueT);
+        int initialF = Integer.parseInt(valueF);
+        int finalT, finalF;
+        if (tfMismatch && tf.equals("T")) {
+            int change = (int) Math.round((100 - initialT) * tfPersuasionRate / 100.0);
+            finalT = Math.min(100, initialT + change);
+            finalF = 100 - finalT;
+        } else if (tfMismatch && tf.equals("F")) {
+            int change = (int) Math.round((100 - initialF) * tfPersuasionRate / 100.0);
+            finalF = Math.min(100, initialF + change);
+            finalT = 100 - finalF;
+        } else {
+            finalT = initialT;
+            finalF = initialF;
+        }
+        
+        // JP 차원
+        int initialJ = Integer.parseInt(valueJ);
+        int initialP = Integer.parseInt(valueP);
+        int finalJ, finalP;
+        if (jpMismatch && jp.equals("J")) {
+            int change = (int) Math.round((100 - initialJ) * jpPersuasionRate / 100.0);
+            finalJ = Math.min(100, initialJ + change);
+            finalP = 100 - finalJ;
+        } else if (jpMismatch && jp.equals("P")) {
+            int change = (int) Math.round((100 - initialP) * jpPersuasionRate / 100.0);
+            finalP = Math.min(100, initialP + change);
+            finalJ = 100 - finalP;
+        } else {
+            finalJ = initialJ;
+            finalP = initialP;
+        }
+        
+        // 최종 퍼센트 값 추가
+        model.addAttribute("finalE", finalE);
+        model.addAttribute("finalI", finalI);
+        model.addAttribute("finalS", finalS);
+        model.addAttribute("finalN", finalN);
+        model.addAttribute("finalT", finalT);
+        model.addAttribute("finalF", finalF);
+        model.addAttribute("finalJ", finalJ);
+        model.addAttribute("finalP", finalP);
 
         log.info("=== 최종 결과 페이지 ===");
         log.info("차원별 설득률: EI={}, SN={}, TF={}, JP={}", eiPersuasionRate, snPersuasionRate, tfPersuasionRate, jpPersuasionRate);
@@ -593,6 +712,11 @@ public class PersuasionBattleController {
         log.info("  - SN: {}", snRoundRates);
         log.info("  - TF: {}", tfRoundRates);
         log.info("  - JP: {}", jpRoundRates);
+        log.info("=== 퍼센트 변화 ===");
+        log.info("EI: {}% -> {}% (E), {}% -> {}% (I)", initialE, finalE, initialI, finalI);
+        log.info("SN: {}% -> {}% (S), {}% -> {}% (N)", initialS, finalS, initialN, finalN);
+        log.info("TF: {}% -> {}% (T), {}% -> {}% (F)", initialT, finalT, initialF, finalF);
+        log.info("JP: {}% -> {}% (J), {}% -> {}% (P)", initialJ, finalJ, initialP, finalP);
 
         return "FinalResultAactivity";
     }

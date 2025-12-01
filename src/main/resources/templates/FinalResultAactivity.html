@@ -254,31 +254,24 @@
         </div>
     </div>
 
-    <div class="persuasion-summary-box">
-        <i data-lucide="sparkles" class="w-5 h-5 mr-2"></i>
-        <span th:text="|${persuadedDimensions}개 차원에서 AI를 설득했습니다! 평균 설득률: ${averagePersuasionRate}%|">
-            2개 차원에서 AI를 설득했습니다! <strong>평균 설득률: 96%</strong>
-        </span>
-    </div>
-
     <div class="ui-card mb-6">
         <h5 class="font-bold text-gray-800 mb-3">AI의 생각 변화</h5>
         <div class="space-y-2 text-sm text-gray-700">
-            <div class="flex justify-between items-center">
-                <span>AI의 E 성향 <strong>91%</strong> 변화</span>
-                <span class="text-gray-500">I &rarr; E</span>
+            <div class="flex justify-between items-center" th:if="${eiPersuasionRate != 0}">
+                <span th:text="|AI의 ${ei} 성향 <strong>${eiPersuasionRate}%</strong> 변화|">AI의 E 성향 <strong>91%</strong> 변화</span>
+                <span class="text-gray-500" th:text="|${aiEi} &rarr; ${ei}|">I &rarr; E</span>
             </div>
-            <div class="flex justify-between items-center">
-                <span>AI의 S 성향 <strong>0%</strong> 변화</span>
-                <span class="text-gray-500">S &rarr; S</span>
+            <div class="flex justify-between items-center" th:if="${snPersuasionRate != 0}">
+                <span th:text="|AI의 ${sn} 성향 <strong>${snPersuasionRate}%</strong> 변화|">AI의 S 성향 <strong>0%</strong> 변화</span>
+                <span class="text-gray-500" th:text="|${aiSn} &rarr; ${sn}|">S &rarr; S</span>
             </div>
-            <div class="flex justify-between items-center">
-                <span>AI의 T 성향 <strong>100%</strong> 변화</span>
-                <span class="text-gray-500">F &rarr; T</span>
+            <div class="flex justify-between items-center" th:if="${tfPersuasionRate != 0}">
+                <span th:text="|AI의 ${tf} 성향 <strong>${tfPersuasionRate}%</strong> 변화|">AI의 T 성향 <strong>100%</strong> 변화</span>
+                <span class="text-gray-500" th:text="|${aiTf} &rarr; ${tf}|">F &rarr; T</span>
             </div>
-            <div class="flex justify-between items-center">
-                <span>AI의 J 성향 <strong>0%</strong> 변화</span>
-                <span class="text-gray-500">J &rarr; J</span>
+            <div class="flex justify-between items-center" th:if="${jpPersuasionRate != 0}">
+                <span th:text="|AI의 ${jp} 성향 <strong>${jpPersuasionRate}%</strong> 변화|">AI의 J 성향 <strong>0%</strong> 변화</span>
+                <span class="text-gray-500" th:text="|${aiJp} &rarr; ${jp}|">J &rarr; J</span>
             </div>
         </div>
     </div>
@@ -296,12 +289,14 @@
         </div>
         <div class="dim-bar-container mb-4">
             <div class="dim-percent">
-                <span class="text-gray-400">5%</span>
-                <span class="text-green-600">96%</span>
+                <span class="text-gray-400" th:text="|${valueE}%|">30%</span>
+                <span th:text="|${finalE}%|"
+                      th:class="${eiMismatch and ei == 'E'} ? 'text-green-600' : 'text-gray-400'">30%</span>
             </div>
             <div class="dim-percent text-right">
-                <span class="text-green-600">4%</span>
-                <span class="text-gray-400">95%</span>
+                <span th:text="|${finalI}%|"
+                      th:class="${eiMismatch and ei == 'I'} ? 'text-green-600' : 'text-gray-400'">70%</span>
+                <span class="text-gray-400" th:text="|${valueI}%|">70%</span>
             </div>
         </div>
 
@@ -312,12 +307,14 @@
         </div>
         <div class="dim-bar-container mb-4">
             <div class="dim-percent">
-                <span class="text-green-600">90%</span>
-                <span class="text-green-600">90%</span>
+                <span class="text-gray-400" th:text="|${valueS}%|">85%</span>
+                <span th:text="|${finalS}%|"
+                      th:class="${snMismatch and sn == 'S'} ? 'text-green-600' : 'text-gray-400'">85%</span>
             </div>
             <div class="dim-percent text-right">
-                <span class="text-gray-400">10%</span>
-                <span class="text-gray-400">10%</span>
+                <span th:text="|${finalN}%|"
+                      th:class="${snMismatch and sn == 'N'} ? 'text-green-600' : 'text-gray-400'">15%</span>
+                <span class="text-gray-400" th:text="|${valueN}%|">15%</span>
             </div>
         </div>
 
@@ -328,12 +325,14 @@
         </div>
         <div class="dim-bar-container mb-4">
             <div class="dim-percent">
-                <span class="text-gray-400">5%</span>
-                <span class="text-green-600">100%</span>
+                <span class="text-gray-400" th:text="|${valueT}%|">20%</span>
+                <span th:text="|${finalT}%|"
+                      th:class="${tfMismatch and tf == 'T'} ? 'text-green-600' : 'text-gray-400'">20%</span>
             </div>
             <div class="dim-percent text-right">
-                <span class="text-green-600">0%</span>
-                <span class="text-gray-400">95%</span>
+                <span th:text="|${finalF}%|"
+                      th:class="${tfMismatch and tf == 'F'} ? 'text-green-600' : 'text-gray-400'">80%</span>
+                <span class="text-gray-400" th:text="|${valueF}%|">80%</span>
             </div>
         </div>
 
@@ -344,12 +343,14 @@
         </div>
         <div class="dim-bar-container">
             <div class="dim-percent">
-                <span class="text-green-600">90%</span>
-                <span class="text-green-600">90%</span>
+                <span class="text-gray-400" th:text="|${valueJ}%|">25%</span>
+                <span th:text="|${finalJ}%|"
+                      th:class="${jpMismatch and jp == 'J'} ? 'text-green-600' : 'text-gray-400'">25%</span>
             </div>
             <div class="dim-percent text-right">
-                <span class="text-gray-400">10%</span>
-                <span class="text-gray-400">10%</span>
+                <span th:text="|${finalP}%|"
+                      th:class="${jpMismatch and jp == 'P'} ? 'text-green-600' : 'text-gray-400'">75%</span>
+                <span class="text-gray-400" th:text="|${valueP}%|">75%</span>
             </div>
         </div>
 
@@ -362,8 +363,8 @@
         <h4 class="text-lg">차원별 대결 결과</h4>
     </div>
 
-    <!-- 에너지 방향 (EI) -->
-    <div class="dimension-result-card space-y-3" th:classappend="${eiMismatch} ? 'mismatch-success' : 'match-perfect'">
+    <!-- 에너지 방향 (EI) - 설득을 시도했고 불일치가 있는 경우만 표시 -->
+    <div class="dimension-result-card space-y-3" th:if="${eiPersuaded and eiMismatch}" th:classappend="'mismatch-success'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">에너지 방향</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
@@ -385,11 +386,9 @@
             <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${!eiMismatch}">완벽 일치</span>
         </div>
 
-        <!-- 라운드별 설득률 (불일치 차원만 표시) -->
         <div class="round-rates-container" th:if="${eiMismatch}">
             <div class="text-xs font-semibold text-gray-600 mb-2">라운드별 설득률</div>
             <div th:if="${eiRoundRates != null and !eiRoundRates.isEmpty()}">
-                <!-- ✅ th:if="${iterStat.index > 0}" 조건 제거 -->
                 <div class="round-rate-item" th:each="rate, iterStat : ${eiRoundRates}">
                     <span class="round-label" th:text="|라운드 ${iterStat.index + 1}|">라운드 1</span>
                     <div class="round-rate-bar">
@@ -410,8 +409,8 @@
         </div>
     </div>
 
-    <!-- 인식 기능 (SN) -->
-    <div class="dimension-result-card space-y-3" th:classappend="${snMismatch} ? 'mismatch-success' : 'match-perfect'">
+    <!-- 인식 기능 (SN) - 설득을 시도했고 불일치가 있는 경우만 표시 -->
+    <div class="dimension-result-card space-y-3" th:if="${snPersuaded and snMismatch}" th:classappend="'mismatch-success'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">인식 기능</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
@@ -433,7 +432,6 @@
             <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${!snMismatch}">완벽 일치</span>
         </div>
 
-        <!-- 라운드별 설득률 (불일치 차원만 표시) -->
         <div class="round-rates-container" th:if="${snMismatch}">
             <div class="text-xs font-semibold text-gray-600 mb-2">라운드별 설득률</div>
             <div th:if="${snRoundRates != null and !snRoundRates.isEmpty()}">
@@ -457,8 +455,8 @@
         </div>
     </div>
 
-    <!-- 판단 기능 (TF) -->
-    <div class="dimension-result-card space-y-3" th:classappend="${tfMismatch} ? 'mismatch-success' : 'match-perfect'">
+    <!-- 판단 기능 (TF) - 설득을 시도했고 불일치가 있는 경우만 표시 -->
+    <div class="dimension-result-card space-y-3" th:if="${tfPersuaded and tfMismatch}" th:classappend="'mismatch-success'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">판단 기능</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
@@ -480,7 +478,6 @@
             <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${!tfMismatch}">완벽 일치</span>
         </div>
 
-        <!-- 라운드별 설득률 (불일치 차원만 표시) -->
         <div class="round-rates-container" th:if="${tfMismatch}">
             <div class="text-xs font-semibold text-gray-600 mb-2">라운드별 설득률</div>
             <div th:if="${tfRoundRates != null and !tfRoundRates.isEmpty()}">
@@ -504,8 +501,8 @@
         </div>
     </div>
 
-    <!-- 생활 양식 (JP) -->
-    <div class="dimension-result-card space-y-3" th:classappend="${jpMismatch} ? 'mismatch-success' : 'match-perfect'">
+    <!-- 생활 양식 (JP) - 설득을 시도했고 불일치가 있는 경우만 표시 -->
+    <div class="dimension-result-card space-y-3" th:if="${jpPersuaded and jpMismatch}" th:classappend="'mismatch-success'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">생활 양식</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
@@ -527,7 +524,6 @@
             <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${!jpMismatch}">완벽 일치</span>
         </div>
 
-        <!-- 라운드별 설득률 (불일치 차원만 표시) -->
         <div class="round-rates-container" th:if="${jpMismatch}">
             <div class="text-xs font-semibold text-gray-600 mb-2">라운드별 설득률</div>
             <div th:if="${jpRoundRates != null and !jpRoundRates.isEmpty()}">
