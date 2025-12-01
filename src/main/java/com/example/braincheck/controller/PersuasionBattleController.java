@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.braincheck.service.PersuasionBattleRoundService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -63,7 +64,8 @@ public class PersuasionBattleController {
             @RequestParam("jpMismatch") boolean jpMismatch,
             @RequestParam(value = "currentRound", defaultValue = "1") int currentRound,
             @RequestParam(value = "persuasionRate", defaultValue = "0") int persuasionRate,
-            Model model) {
+            Model model,
+            HttpSession session) {
         String fullMbti = ei + sn + tf + jp;
 
         // 주로 제네릭 타입(List<String>)과 로우 타입(List - 제네릭을 명시하지 않은 타입) 간의 변환이나 캐스팅(Casting) 과정에서 발생하는 경고 무시하는 어노테이션
@@ -193,6 +195,30 @@ public class PersuasionBattleController {
         model.addAttribute("aiFeedbackList", aiFeedbackList);
         model.addAttribute("persuasionRateList", persuasionRateList);//설득률 리스트
         model.addAttribute("persuasionGainList", persuasionGainList);//라운드별 설득력 증가량
+        
+        // 세션에서 차원별 설득률 Map 가져오기
+        @SuppressWarnings("unchecked")
+        Map<String, Integer> existingDimensionPersuasionRateMap = (Map<String, Integer>) session.getAttribute("dimensionPersuasionRateMap");
+        if (existingDimensionPersuasionRateMap == null) {
+            existingDimensionPersuasionRateMap = new HashMap<>();
+            log.warn("⚠️ /start 페이지: 세션에서 dimensionPersuasionRateMap을 찾을 수 없습니다. 새로 생성합니다.");
+        } else {
+            log.info("✅ /start 페이지: 세션에서 dimensionPersuasionRateMap을 가져왔습니다. 크기: {}, 내용: {}", 
+                    existingDimensionPersuasionRateMap.size(), existingDimensionPersuasionRateMap);
+        }
+        model.addAttribute("dimensionPersuasionRateMap", existingDimensionPersuasionRateMap);
+        
+        // 세션에서 차원별 라운드별 설득률 Map 가져오기
+        @SuppressWarnings("unchecked")
+        Map<String, List<Integer>> existingDimensionRoundRateMap = (Map<String, List<Integer>>) session.getAttribute("dimensionRoundRateMap");
+        if (existingDimensionRoundRateMap == null) {
+            existingDimensionRoundRateMap = new HashMap<>();
+            log.warn("⚠️ /start 페이지: 세션에서 dimensionRoundRateMap을 찾을 수 없습니다. 새로 생성합니다.");
+        } else {
+            log.info("✅ /start 페이지: 세션에서 dimensionRoundRateMap을 가져왔습니다. 크기: {}, 내용: {}", 
+                    existingDimensionRoundRateMap.size(), existingDimensionRoundRateMap);
+        }
+        model.addAttribute("dimensionRoundRateMap", existingDimensionRoundRateMap);
 
         return "PersuasionBattleActivity";
 
@@ -238,7 +264,8 @@ public class PersuasionBattleController {
             @RequestParam(value = "persuasionGainList", required = false) List<Integer> persuasionGainList,
             // 다음 페이지로 데이터를 안전하게 전달하기 위한 객체
             RedirectAttributes redirectAttributes,
-            Model model) {
+            Model model,
+            HttpSession session) {
 
         // 현재 상태 데이터를 맵으로 준비
         Map<String, Object> currentData = new HashMap<>();
@@ -260,13 +287,38 @@ public class PersuasionBattleController {
         currentData.put("persuasionRateList", persuasionRateList != null ? persuasionRateList : new ArrayList<>());
         currentData.put("persuasionGainList", persuasionGainList != null ? persuasionGainList : new ArrayList<>());
 
-        // Flash Attribute에서 차원별 설득률 Map 가져오기 (이전 차원의 설득률 유지)
+        // 세션에서 차원별 설득률 Map 가져오기 (이전 차원의 설득률 유지)
+        // POST 요청에서는 Flash Attribute를 직접 가져올 수 없으므로 세션 사용
         @SuppressWarnings("unchecked")
-        Map<String, Integer> existingDimensionPersuasionRateMap = (Map<String, Integer>) model.asMap().get("dimensionPersuasionRateMap");
+        Map<String, Integer> existingDimensionPersuasionRateMap = (Map<String, Integer>) session.getAttribute("dimensionPersuasionRateMap");
         if (existingDimensionPersuasionRateMap == null) {
             existingDimensionPersuasionRateMap = new HashMap<>();
+            log.warn("⚠️ POST 요청: 세션에서 dimensionPersuasionRateMap을 찾을 수 없습니다. 새로 생성합니다.");
+        } else {
+            log.info("✅ POST 요청: 세션에서 dimensionPersuasionRateMap을 가져왔습니다. 크기: {}, 내용: {}", 
+                    existingDimensionPersuasionRateMap.size(), existingDimensionPersuasionRateMap);
         }
         currentData.put("dimensionPersuasionRateMap", existingDimensionPersuasionRateMap);
+        
+        // 세션에서 차원별 라운드별 설득률 Map 가져오기 (이전 차원의 라운드별 설득률 유지)
+        @SuppressWarnings("unchecked")
+        Map<String, List<Integer>> existingDimensionRoundRateMap = (Map<String, List<Integer>>) session.getAttribute("dimensionRoundRateMap");
+        if (existingDimensionRoundRateMap == null) {
+            existingDimensionRoundRateMap = new HashMap<>();
+            log.warn("⚠️ POST 요청: 세션에서 dimensionRoundRateMap을 찾을 수 없습니다. 새로 생성합니다.");
+        } else {
+            log.info("✅ POST 요청: 세션에서 dimensionRoundRateMap을 가져왔습니다. 크기: {}, 내용: {}", 
+                    existingDimensionRoundRateMap.size(), existingDimensionRoundRateMap);
+            existingDimensionRoundRateMap.forEach((dim, rates) -> 
+                log.info("  - 차원 {}: 라운드별 설득률 {}", dim, rates)
+            );
+        }
+        currentData.put("dimensionRoundRateMap", existingDimensionRoundRateMap);
+        
+        log.info("=== 서비스 호출 전 현재 상태 ===");
+        log.info("현재 차원: {}, 현재 라운드: {}", dimension, currentRound);
+        log.info("서비스에 전달할 dimensionPersuasionRateMap: {}", existingDimensionPersuasionRateMap);
+        log.info("서비스에 전달할 dimensionRoundRateMap: {}", existingDimensionRoundRateMap);
 
         // 서비스 호출하여 다음 라운드 데이터 가져오기
         Map<String, Object> nextStateData = persuasionBattleRoundService.processNextRound(currentData);
@@ -289,6 +341,8 @@ public class PersuasionBattleController {
         List<Integer> updatedPersuasionGainList = (List<Integer>) nextStateData.get("persuasionGainList");
         @SuppressWarnings("unchecked")
         Map<String, Integer> updatedDimensionPersuasionRateMap = (Map<String, Integer>) nextStateData.get("dimensionPersuasionRateMap");
+        @SuppressWarnings("unchecked")
+        Map<String, List<Integer>> updatedDimensionRoundRateMap = (Map<String, List<Integer>>) nextStateData.get("dimensionRoundRateMap");
 
         log.info("=== 서비스 처리 후 결과 ===");
         log.info("다음 라운드: {}, 새 설득률: {}", nextRound, newPersuasionRate);
@@ -301,6 +355,25 @@ public class PersuasionBattleController {
             log.warn("⚠️ updatedAiFeedbackList가 비어있습니다!");
         }
         log.info("차원별 설득률 Map: {}", updatedDimensionPersuasionRateMap);
+        log.info("차원별 라운드별 설득률 Map: {}", updatedDimensionRoundRateMap);
+        if (updatedDimensionRoundRateMap != null) {
+            updatedDimensionRoundRateMap.forEach((dim, rates) -> 
+                log.info("  - 차원 {}: 라운드별 설득률 {}", dim, rates)
+            );
+        }
+        
+        // 세션에 업데이트된 Map 저장 (다음 요청에서 사용)
+        session.setAttribute("dimensionPersuasionRateMap", updatedDimensionPersuasionRateMap);
+        session.setAttribute("dimensionRoundRateMap", updatedDimensionRoundRateMap);
+        log.info("✅ 세션에 차원별 설득률 Map 저장 완료");
+        
+        // Map이 null이거나 비어있는 경우 경고
+        if (updatedDimensionPersuasionRateMap == null || updatedDimensionPersuasionRateMap.isEmpty()) {
+            log.warn("⚠️ 차원별 설득률 Map이 비어있습니다! 모든 차원의 설득률이 저장되지 않았을 수 있습니다.");
+        }
+        if (updatedDimensionRoundRateMap == null || updatedDimensionRoundRateMap.isEmpty()) {
+            log.warn("⚠️ 차원별 라운드별 설득률 Map이 비어있습니다! 모든 차원의 라운드별 설득률이 저장되지 않았을 수 있습니다.");
+        }
 
         if (isFinished) {
             // 최종 결과 페이지로 리다이렉트
@@ -322,8 +395,9 @@ public class PersuasionBattleController {
             redirectAttributes.addAttribute("tfMismatch", tfMismatch);
             redirectAttributes.addAttribute("jpMismatch", jpMismatch);
 
-            // 차원별 설득률 Map을 Flash Attribute로 전달
+            // 차원별 설득률 Map과 라운드별 설득률 Map을 Flash Attribute로 전달
             redirectAttributes.addFlashAttribute("dimensionPersuasionRateMap", updatedDimensionPersuasionRateMap);
+            redirectAttributes.addFlashAttribute("dimensionRoundRateMap", updatedDimensionRoundRateMap);
 
             return "redirect:/persuade/final";
         }
@@ -366,6 +440,7 @@ public class PersuasionBattleController {
         redirectAttributes.addFlashAttribute("persuasionRateList", updatedPersuasionRateList);
         redirectAttributes.addFlashAttribute("persuasionGainList", updatedPersuasionGainList);
         redirectAttributes.addFlashAttribute("dimensionPersuasionRateMap", updatedDimensionPersuasionRateMap);
+        redirectAttributes.addFlashAttribute("dimensionRoundRateMap", updatedDimensionRoundRateMap);
 
         //다음 페이지 리다이렉션 주소
         return "redirect:/persuade/start";
@@ -391,21 +466,46 @@ public class PersuasionBattleController {
             @RequestParam("snMismatch") boolean snMismatch,
             @RequestParam("tfMismatch") boolean tfMismatch,
             @RequestParam("jpMismatch") boolean jpMismatch,
-            Model model) {
+            Model model,
+            HttpSession session) {
 
-        // Flash Attribute에서 차원별 설득률 Map 가져오기
+        // 세션에서 차원별 설득률 Map 가져오기
         @SuppressWarnings("unchecked")
-        Map<String, Integer> dimensionPersuasionRateMap = (Map<String, Integer>) model.asMap().get("dimensionPersuasionRateMap");
-
+        Map<String, Integer> dimensionPersuasionRateMap = (Map<String, Integer>) session.getAttribute("dimensionPersuasionRateMap");
         if (dimensionPersuasionRateMap == null) {
             dimensionPersuasionRateMap = new HashMap<>();
+            log.warn("⚠️ 최종 결과 페이지: 세션에서 dimensionPersuasionRateMap을 찾을 수 없습니다. 새로 생성합니다.");
+        } else {
+            log.info("✅ 최종 결과 페이지: 세션에서 dimensionPersuasionRateMap을 가져왔습니다. 크기: {}, 내용: {}", 
+                    dimensionPersuasionRateMap.size(), dimensionPersuasionRateMap);
+        }
+        
+        // 세션에서 차원별 라운드별 설득률 Map 가져오기
+        @SuppressWarnings("unchecked")
+        Map<String, List<Integer>> dimensionRoundRateMap = (Map<String, List<Integer>>) session.getAttribute("dimensionRoundRateMap");
+        if (dimensionRoundRateMap == null) {
+            dimensionRoundRateMap = new HashMap<>();
+            log.warn("⚠️ 최종 결과 페이지: 세션에서 dimensionRoundRateMap을 찾을 수 없습니다. 새로 생성합니다.");
+        } else {
+            log.info("✅ 최종 결과 페이지: 세션에서 dimensionRoundRateMap을 가져왔습니다. 크기: {}, 내용: {}", 
+                    dimensionRoundRateMap.size(), dimensionRoundRateMap);
+            dimensionRoundRateMap.forEach((dim, rates) -> 
+                log.info("  - 차원 {}: 라운드별 설득률 {}", dim, rates)
+            );
         }
 
         // 차원별 설득률 계산 (불일치한 차원만)
+        // 설득을 시도한 차원은 dimensionPersuasionRateMap에 저장되어 있음
         int eiPersuasionRate = eiMismatch ? dimensionPersuasionRateMap.getOrDefault("EI", 0) : 100;
         int snPersuasionRate = snMismatch ? dimensionPersuasionRateMap.getOrDefault("SN", 0) : 100;
         int tfPersuasionRate = tfMismatch ? dimensionPersuasionRateMap.getOrDefault("TF", 0) : 100;
         int jpPersuasionRate = jpMismatch ? dimensionPersuasionRateMap.getOrDefault("JP", 0) : 100;
+        
+        log.info("=== 차원별 설득률 계산 결과 ===");
+        log.info("EI 불일치: {}, 설득률: {}", eiMismatch, eiPersuasionRate);
+        log.info("SN 불일치: {}, 설득률: {}", snMismatch, snPersuasionRate);
+        log.info("TF 불일치: {}, 설득률: {}", tfMismatch, tfPersuasionRate);
+        log.info("JP 불일치: {}, 설득률: {}", jpMismatch, jpPersuasionRate);
 
         // 평균 설득률 계산
         int totalRate = 0;
@@ -467,10 +567,32 @@ public class PersuasionBattleController {
         model.addAttribute("jpPersuasionRate", jpPersuasionRate);
         model.addAttribute("averagePersuasionRate", averagePersuasionRate);
         model.addAttribute("persuadedDimensions", persuadedDimensions);
+        
+        // 차원별 라운드별 설득률 추가 (설득을 시도한 차원만)
+        List<Integer> eiRoundRates = dimensionRoundRateMap.getOrDefault("EI", new ArrayList<>());
+        List<Integer> snRoundRates = dimensionRoundRateMap.getOrDefault("SN", new ArrayList<>());
+        List<Integer> tfRoundRates = dimensionRoundRateMap.getOrDefault("TF", new ArrayList<>());
+        List<Integer> jpRoundRates = dimensionRoundRateMap.getOrDefault("JP", new ArrayList<>());
+        
+        log.info("=== Model에 추가할 라운드별 설득률 ===");
+        log.info("EI 라운드별 설득률: {} (크기: {})", eiRoundRates, eiRoundRates.size());
+        log.info("SN 라운드별 설득률: {} (크기: {})", snRoundRates, snRoundRates.size());
+        log.info("TF 라운드별 설득률: {} (크기: {})", tfRoundRates, tfRoundRates.size());
+        log.info("JP 라운드별 설득률: {} (크기: {})", jpRoundRates, jpRoundRates.size());
+        
+        model.addAttribute("eiRoundRates", eiRoundRates);
+        model.addAttribute("snRoundRates", snRoundRates);
+        model.addAttribute("tfRoundRates", tfRoundRates);
+        model.addAttribute("jpRoundRates", jpRoundRates);
 
         log.info("=== 최종 결과 페이지 ===");
         log.info("차원별 설득률: EI={}, SN={}, TF={}, JP={}", eiPersuasionRate, snPersuasionRate, tfPersuasionRate, jpPersuasionRate);
         log.info("평균 설득률: {}, 설득한 차원: {}", averagePersuasionRate, persuadedDimensions);
+        log.info("차원별 라운드별 설득률:");
+        log.info("  - EI: {}", eiRoundRates);
+        log.info("  - SN: {}", snRoundRates);
+        log.info("  - TF: {}", tfRoundRates);
+        log.info("  - JP: {}", jpRoundRates);
 
         return "FinalResultAactivity";
     }

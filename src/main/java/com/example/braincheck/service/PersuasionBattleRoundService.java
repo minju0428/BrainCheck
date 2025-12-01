@@ -52,43 +52,42 @@ public class PersuasionBattleRoundService {
         // 차원별 최종 설득률을 저장하는 Map (결과 페이지에서 사용)
         @SuppressWarnings("unchecked")
         Map<String, Integer> dimensionPersuasionRateMap = (Map<String, Integer>) currentData.getOrDefault("dimensionPersuasionRateMap", new HashMap<>());
+        
+        // 차원별 라운드별 설득률을 저장하는 Map (결과 페이지에서 사용)
+        @SuppressWarnings("unchecked")
+        Map<String, List<Integer>> dimensionRoundRateMap = (Map<String, List<Integer>>) currentData.getOrDefault("dimensionRoundRateMap", new HashMap<>());
 
-        // 3라운드는 마지막 라운드이므로 AI 피드백을 받지 않음
+        // 모든 라운드(1, 2, 3)에서 AI 피드백을 받음
         int scoreGained = 0;
         String feedback = "";
 
-        if (currentRound < 3) {
-            // 1-2라운드: AI 프롬프트 서비스 호출 (AI에게 현재 라운드의 논거를 분석 요청)
-            // 이전 라운드 설득문도 함께 전달 (현재 라운드의 evidenceText는 아직 리스트에 추가되지 않았으므로 userHistoryList가 이전 라운드들임)
-            String aiResponseText = aiPromptService.analyzePersuasionEvidence(
-                    characterName,
-                    title,
-                    category,
-                    dimension,
-                    userMbtiType,
-                    aiMbtiType,
-                    evidenceText,
-                    currentRound,
-                    userHistoryList // 이전 라운드 설득문 리스트 전달
-            );
+        // 1-3라운드: AI 프롬프트 서비스 호출 (AI에게 현재 라운드의 논거를 분석 요청)
+        // 이전 라운드 설득문도 함께 전달 (현재 라운드의 evidenceText는 아직 리스트에 추가되지 않았으므로 userHistoryList가 이전 라운드들임)
+        String aiResponseText = aiPromptService.analyzePersuasionEvidence(
+                characterName,
+                title,
+                category,
+                dimension,
+                userMbtiType,
+                aiMbtiType,
+                evidenceText,
+                currentRound,
+                userHistoryList // 이전 라운드 설득문 리스트 전달
+        );
 
-            // 2. AI 응답 파싱 (Score, Feedback 추출)
-            log.info("=== AI 원본 응답 ===");
-            log.info("{}", aiResponseText);
-            log.info("==================");
+        // 2. AI 응답 파싱 (Score, Feedback 추출)
+        log.info("=== AI 원본 응답 ===");
+        log.info("{}", aiResponseText);
+        log.info("==================");
 
-            AiRoundResult aiRoundResult = parseAiPersuasionResponse(aiResponseText);
+        AiRoundResult aiRoundResult = parseAiPersuasionResponse(aiResponseText);
 
-            log.info("=== 파싱 결과 ===");
-            log.info("Score: {}, Feedback: [{}]", aiRoundResult.getScore(), aiRoundResult.getFeedback());
-            log.info("================");
+        log.info("=== 파싱 결과 ===");
+        log.info("Score: {}, Feedback: [{}]", aiRoundResult.getScore(), aiRoundResult.getFeedback());
+        log.info("================");
 
-            scoreGained = aiRoundResult.getScore();
-            feedback = aiRoundResult.getFeedback();
-        } else {
-            // 3라운드: AI 피드백 없이 설득문만 저장
-            log.info("3라운드 (마지막 라운드)이므로 AI 피드백을 받지 않습니다.");
-        }
+        scoreGained = aiRoundResult.getScore();
+        feedback = aiRoundResult.getFeedback();
 
         // 3. 설득 기록 리스트에 저장
         userHistoryList.add(evidenceText);
@@ -100,7 +99,6 @@ public class PersuasionBattleRoundService {
                 userHistoryList.size(), aiFeedbackList.size());
 
         // 4. 설득률 업데이트 (누적, 최대 100까지)
-        // 3라운드는 scoreGained가 0이므로 설득률이 증가하지 않음
         int newPersuasionRate = Math.min(100, persuasionRate + scoreGained);
         persuasionRateList.add(newPersuasionRate);
         if (scoreGained > 0) {
@@ -118,7 +116,25 @@ public class PersuasionBattleRoundService {
             // 현재 차원의 최종 설득률을 Map에 저장 (결과 페이지에서 사용)
             dimensionPersuasionRateMap.put(dimension, newPersuasionRate);
             log.info("차원 {}의 최종 설득률 {} 저장", dimension, newPersuasionRate);
+            log.info("현재까지 저장된 모든 차원의 설득률: {}", dimensionPersuasionRateMap);
 
+            // 현재 차원의 라운드별 설득률 리스트를 Map에 저장 (결과 페이지에서 사용)
+            // persuasionRateList의 복사본을 저장 (초기화 전에 저장)
+            List<Integer> dimensionRoundRates = new ArrayList<>();
+            for (Integer rate : persuasionRateList) {
+                dimensionRoundRates.add(rate);
+            }
+            dimensionRoundRateMap.put(dimension, dimensionRoundRates);
+            log.info("차원 {}의 라운드별 설득률 {} 저장 (크기: {})", dimension, dimensionRoundRates, dimensionRoundRates.size());
+            log.info("현재까지 저장된 모든 차원의 라운드별 설득률: {}", dimensionRoundRateMap);
+
+            // 저장 직후 검증 로그 추가
+            if (dimensionRoundRateMap.containsKey(dimension)) {
+                List<Integer> savedRates = dimensionRoundRateMap.get(dimension);
+                log.info("✅ 차원 {} 저장 검증 완료. 저장된 데이터: {}", dimension, savedRates);
+            } else {
+                log.error("❌ 차원 {} 저장 실패!", dimension);
+            }
             // 현재 차원 (dimension)을 battleList에서 제거
             battleList.remove(dimension);
 
@@ -132,7 +148,6 @@ public class PersuasionBattleRoundService {
                 userHistoryList = new ArrayList<>();
                 aiFeedbackList = new ArrayList<>();
                 persuasionRateList = new ArrayList<>();
-                persuasionRateList.add(0); // 초기 설득률 0 추가
                 persuasionGainList = new ArrayList<>();
 
                 log.info("차원 전환 완료: {} -> {}. 라운드 초기화.", dimension, nextDimension);
@@ -165,6 +180,7 @@ public class PersuasionBattleRoundService {
         nextStateData.put("persuasionRateList", persuasionRateList);
         nextStateData.put("persuasionGainList", persuasionGainList);
         nextStateData.put("dimensionPersuasionRateMap", dimensionPersuasionRateMap);
+        nextStateData.put("dimensionRoundRateMap", dimensionRoundRateMap);
         nextStateData.put("isFinished", isFinished);
 
         return nextStateData;

@@ -36,18 +36,18 @@
 
         /* 설득 결과 요약 박스 스타일 */
         .persuasion-summary-box {
-            background-color: #e0f2fe; /* 연한 파란색 배경 */
+            background-color: #e0f2fe;
             border-radius: 8px;
             padding: 1rem;
             font-weight: 500;
-            color: #1e40af; /* 진한 파란색 텍스트 */
+            color: #1e40af;
             display: flex;
             align-items: center;
             margin-bottom: 1rem;
         }
 
         .persuasion-summary-box i {
-            color: #f59e0b; /* 전구 아이콘 색상 */
+            color: #f59e0b;
             margin-right: 0.5rem;
         }
 
@@ -59,14 +59,14 @@
 
         /* MBTI 결과 태그 스타일 */
         .mbti-tag-user {
-            background-color: #6C5CE7; /* 설득 라운드 선택 배경색 */
+            background-color: #6C5CE7;
             color: white;
             padding: 4px 12px;
             border-radius: 9999px;
             font-weight: 600;
         }
         .mbti-tag-ai {
-            background-color: #1A73E8; /* 설득 라운드 AI 배경색 */
+            background-color: #1A73E8;
             color: white;
             padding: 4px 12px;
             border-radius: 9999px;
@@ -82,12 +82,12 @@
 
         /* 불일치 (설득 성공) - 퍼플/핑크 계열 */
         .mismatch-success {
-            background-color: #fef0ff; /* 연한 핑크/퍼플 */
+            background-color: #fef0ff;
             border: 1px solid #ff71c6;
         }
         /* 일치 (완벽 일치) - 그린 계열 */
         .match-perfect {
-            background-color: #f0fff8; /* 연한 민트/그린 */
+            background-color: #f0fff8;
             border: 1px solid #68d391;
         }
 
@@ -119,10 +119,10 @@
         }
 
         .icon-check {
-            color: #28a745; /* 진한 녹색 */
+            color: #28a745;
         }
         .icon-cross {
-            color: #dc3545; /* 진한 빨강 */
+            color: #dc3545;
         }
 
         /* AI 상세 분석 지표 스타일 */
@@ -148,16 +148,16 @@
             font-weight: 600;
             font-size: 0.75rem;
             text-align: center;
-            width: 32px; /* 태그 너비 고정 */
+            width: 32px;
         }
         .tag-e, .tag-i, .tag-s, .tag-n, .tag-t, .tag-f, .tag-j, .tag-p {
-            background-color: #6C5CE7; /* 기본 퍼플 */
+            background-color: #6C5CE7;
         }
         .tag-e, .tag-s, .tag-t, .tag-j {
-            background-color: #6C5CE7; /* 사용자측 퍼플 */
+            background-color: #6C5CE7;
         }
         .tag-i, .tag-n, .tag-f, .tag-p {
-            background-color: #1A73E8; /* AI측 블루 */
+            background-color: #1A73E8;
         }
         .dim-row {
             display: flex;
@@ -191,6 +191,44 @@
             font-weight: 600;
             color: #1f2937;
         }
+
+        /* 라운드별 설득률 스타일 */
+        .round-rates-container {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .round-rate-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .round-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            width: 4rem;
+        }
+        .round-rate-bar {
+            flex-grow: 1;
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .round-rate-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #b862ff, #ff71c6);
+            border-radius: 3px;
+        }
+        .round-rate-value {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            width: 3rem;
+            text-align: right;
+        }
     </style>
 </head>
 <body class="flex justify-center py-8 px-4">
@@ -205,20 +243,22 @@
     <div class="ui-card info-card mb-6">
         <div class="flex items-center space-x-4">
             <div class="flex-grow">
-                <p class="text-xl font-bold text-gray-800">독고</p>
-                <p class="text-sm text-gray-500">불편한 편의점</p>
+                <p class="text-xl font-bold text-gray-800" th:text="${characterName}">독고</p>
+                <p class="text-sm text-gray-500" th:text="${title}">불편한 편의점</p>
             </div>
         </div>
 
         <div class="flex flex-col items-end space-y-1 text-xs">
-            <span class="mbti-tag-user">당신: ESTJ</span>
-            <span class="mbti-tag-ai">AI: ISFJ</span>
+            <span class="mbti-tag-user" th:text="|당신: ${fullMbti}|">당신: ESTJ</span>
+            <span class="mbti-tag-ai" th:text="|AI: ${aiThing}|">AI: ISFJ</span>
         </div>
     </div>
 
     <div class="persuasion-summary-box">
         <i data-lucide="sparkles" class="w-5 h-5 mr-2"></i>
-        <span>2개 차원에서 AI를 설득했습니다! <strong>평균 설득률: 96%</strong></span>
+        <span th:text="|${persuadedDimensions}개 차원에서 AI를 설득했습니다! 평균 설득률: ${averagePersuasionRate}%|">
+            2개 차원에서 AI를 설득했습니다! <strong>평균 설득률: 96%</strong>
+        </span>
     </div>
 
     <div class="ui-card mb-6">
@@ -322,95 +362,192 @@
         <h4 class="text-lg">차원별 대결 결과</h4>
     </div>
 
-    <div class="dimension-result-card mismatch-success space-y-3">
+    <!-- 에너지 방향 (EI) -->
+    <div class="dimension-result-card space-y-3" th:classappend="${eiMismatch} ? 'mismatch-success' : 'match-perfect'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">에너지 방향</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
-                <span class="text-purple-600">당신: E</span>
-                <i data-lucide="x" class="result-icon icon-cross"></i>
-                <span class="text-blue-600">AI: I</span>
+                <span class="text-purple-600" th:text="|당신: ${ei}|">당신: E</span>
+                <i data-lucide="x" class="result-icon icon-cross" th:if="${eiMismatch}"></i>
+                <i data-lucide="check" class="result-icon icon-check" th:if="${!eiMismatch}"></i>
+                <span class="text-blue-600" th:text="|AI: ${aiEi}|">AI: I</span>
             </div>
         </div>
 
         <div class="flex items-center space-x-3">
             <div class="persuasion-bar-container">
-                <div class="persuasion-fill" style="width: 91%;"></div>
+                <div th:if="${eiMismatch}" class="persuasion-fill" th:style="|width: ${eiPersuasionRate}%;|"></div>
+                <div th:if="${!eiMismatch}" class="match-fill" style="width: 100%;"></div>
             </div>
-            <span class="text-sm font-bold text-gray-700 w-16 text-right">설득률 91%</span>
+            <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${eiMismatch}" th:text="|총 설득률: ${eiPersuasionRate}%|">
+                총 설득률: 91%
+            </span>
+            <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${!eiMismatch}">완벽 일치</span>
+        </div>
+
+        <!-- 라운드별 설득률 (불일치 차원만 표시) -->
+        <div class="round-rates-container" th:if="${eiMismatch}">
+            <div class="text-xs font-semibold text-gray-600 mb-2">라운드별 설득률</div>
+            <div th:if="${eiRoundRates != null and !eiRoundRates.isEmpty()}">
+                <!-- ✅ th:if="${iterStat.index > 0}" 조건 제거 -->
+                <div class="round-rate-item" th:each="rate, iterStat : ${eiRoundRates}">
+                    <span class="round-label" th:text="|라운드 ${iterStat.index + 1}|">라운드 1</span>
+                    <div class="round-rate-bar">
+                        <div class="round-rate-fill" th:style="|width: ${rate}%;|"></div>
+                    </div>
+                    <span class="round-rate-value" th:text="|${rate}%|">0%</span>
+                </div>
+            </div>
+            <div class="text-xs text-gray-400 italic" th:if="${eiRoundRates == null or eiRoundRates.isEmpty()}">
+                라운드 데이터가 없습니다.
+            </div>
         </div>
 
         <div class="flex items-center text-sm font-semibold text-green-600 pt-1">
             <i data-lucide="check-square" class="result-icon icon-check mr-1"></i>
-            설득력 있는 논거를 제시했습니다!
+            <span th:if="${eiMismatch}">설득력 있는 논거를 제시했습니다!</span>
+            <span th:if="${!eiMismatch}">100% 일치</span>
         </div>
     </div>
 
-    <div class="dimension-result-card match-perfect space-y-3">
+    <!-- 인식 기능 (SN) -->
+    <div class="dimension-result-card space-y-3" th:classappend="${snMismatch} ? 'mismatch-success' : 'match-perfect'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">인식 기능</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
-                <span class="text-purple-600">당신: S</span>
-                <i data-lucide="check" class="result-icon icon-check"></i>
-                <span class="text-blue-600">AI: S</span>
+                <span class="text-purple-600" th:text="|당신: ${sn}|">당신: S</span>
+                <i data-lucide="x" class="result-icon icon-cross" th:if="${snMismatch}"></i>
+                <i data-lucide="check" class="result-icon icon-check" th:if="${!snMismatch}"></i>
+                <span class="text-blue-600" th:text="|AI: ${aiSn}|">AI: S</span>
             </div>
         </div>
 
         <div class="flex items-center space-x-3">
             <div class="persuasion-bar-container">
-                <div class="match-fill" style="width: 100%;"></div>
+                <div th:if="${snMismatch}" class="persuasion-fill" th:style="|width: ${snPersuasionRate}%;|"></div>
+                <div th:if="${!snMismatch}" class="match-fill" style="width: 100%;"></div>
             </div>
-            <span class="text-sm font-bold text-gray-700 w-16 text-right">완벽 일치</span>
+            <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${snMismatch}" th:text="|총 설득률: ${snPersuasionRate}%|">
+                총 설득률: 0%
+            </span>
+            <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${!snMismatch}">완벽 일치</span>
+        </div>
+
+        <!-- 라운드별 설득률 (불일치 차원만 표시) -->
+        <div class="round-rates-container" th:if="${snMismatch}">
+            <div class="text-xs font-semibold text-gray-600 mb-2">라운드별 설득률</div>
+            <div th:if="${snRoundRates != null and !snRoundRates.isEmpty()}">
+                <div class="round-rate-item" th:each="rate, iterStat : ${snRoundRates}">
+                    <span class="round-label" th:text="|라운드 ${iterStat.index + 1}|">라운드 1</span>
+                    <div class="round-rate-bar">
+                        <div class="round-rate-fill" th:style="|width: ${rate}%;|"></div>
+                    </div>
+                    <span class="round-rate-value" th:text="|${rate}%|">0%</span>
+                </div>
+            </div>
+            <div class="text-xs text-gray-400 italic" th:if="${snRoundRates == null or snRoundRates.isEmpty()}">
+                라운드 데이터가 없습니다.
+            </div>
         </div>
 
         <div class="flex items-center text-sm font-semibold text-green-600 pt-1">
             <i data-lucide="check-square" class="result-icon icon-check mr-1"></i>
-            100% 일치
+            <span th:if="${snMismatch}">설득력 있는 논거를 제시했습니다!</span>
+            <span th:if="${!snMismatch}">100% 일치</span>
         </div>
     </div>
 
-    <div class="dimension-result-card mismatch-success space-y-3">
+    <!-- 판단 기능 (TF) -->
+    <div class="dimension-result-card space-y-3" th:classappend="${tfMismatch} ? 'mismatch-success' : 'match-perfect'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">판단 기능</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
-                <span class="text-purple-600">당신: T</span>
-                <i data-lucide="x" class="result-icon icon-cross"></i>
-                <span class="text-blue-600">AI: F</span>
+                <span class="text-purple-600" th:text="|당신: ${tf}|">당신: T</span>
+                <i data-lucide="x" class="result-icon icon-cross" th:if="${tfMismatch}"></i>
+                <i data-lucide="check" class="result-icon icon-check" th:if="${!tfMismatch}"></i>
+                <span class="text-blue-600" th:text="|AI: ${aiTf}|">AI: F</span>
             </div>
         </div>
 
         <div class="flex items-center space-x-3">
             <div class="persuasion-bar-container">
-                <div class="persuasion-fill" style="width: 100%;"></div>
+                <div th:if="${tfMismatch}" class="persuasion-fill" th:style="|width: ${tfPersuasionRate}%;|"></div>
+                <div th:if="${!tfMismatch}" class="match-fill" style="width: 100%;"></div>
             </div>
-            <span class="text-sm font-bold text-gray-700 w-16 text-right">설득률 100%</span>
+            <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${tfMismatch}" th:text="|총 설득률: ${tfPersuasionRate}%|">
+                총 설득률: 100%
+            </span>
+            <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${!tfMismatch}">완벽 일치</span>
+        </div>
+
+        <!-- 라운드별 설득률 (불일치 차원만 표시) -->
+        <div class="round-rates-container" th:if="${tfMismatch}">
+            <div class="text-xs font-semibold text-gray-600 mb-2">라운드별 설득률</div>
+            <div th:if="${tfRoundRates != null and !tfRoundRates.isEmpty()}">
+                <div class="round-rate-item" th:each="rate, iterStat : ${tfRoundRates}">
+                    <span class="round-label" th:text="|라운드 ${iterStat.index + 1}|">라운드 1</span>
+                    <div class="round-rate-bar">
+                        <div class="round-rate-fill" th:style="|width: ${rate}%;|"></div>
+                    </div>
+                    <span class="round-rate-value" th:text="|${rate}%|">0%</span>
+                </div>
+            </div>
+            <div class="text-xs text-gray-400 italic" th:if="${tfRoundRates == null or tfRoundRates.isEmpty()}">
+                라운드 데이터가 없습니다.
+            </div>
         </div>
 
         <div class="flex items-center text-sm font-semibold text-green-600 pt-1">
             <i data-lucide="check-square" class="result-icon icon-check mr-1"></i>
-            설득력 있는 논거를 제시했습니다!
+            <span th:if="${tfMismatch}">설득력 있는 논거를 제시했습니다!</span>
+            <span th:if="${!tfMismatch}">100% 일치</span>
         </div>
     </div>
 
-    <div class="dimension-result-card match-perfect space-y-3">
+    <!-- 생활 양식 (JP) -->
+    <div class="dimension-result-card space-y-3" th:classappend="${jpMismatch} ? 'mismatch-success' : 'match-perfect'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">생활 양식</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
-                <span class="text-purple-600">당신: J</span>
-                <i data-lucide="check" class="result-icon icon-check"></i>
-                <span class="text-blue-600">AI: J</span>
+                <span class="text-purple-600" th:text="|당신: ${jp}|">당신: J</span>
+                <i data-lucide="x" class="result-icon icon-cross" th:if="${jpMismatch}"></i>
+                <i data-lucide="check" class="result-icon icon-check" th:if="${!jpMismatch}"></i>
+                <span class="text-blue-600" th:text="|AI: ${aiJp}|">AI: J</span>
             </div>
         </div>
 
         <div class="flex items-center space-x-3">
             <div class="persuasion-bar-container">
-                <div class="match-fill" style="width: 100%;"></div>
+                <div th:if="${jpMismatch}" class="persuasion-fill" th:style="|width: ${jpPersuasionRate}%;|"></div>
+                <div th:if="${!jpMismatch}" class="match-fill" style="width: 100%;"></div>
             </div>
-            <span class="text-sm font-bold text-gray-700 w-16 text-right">완벽 일치</span>
+            <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${jpMismatch}" th:text="|총 설득률: ${jpPersuasionRate}%|">
+                총 설득률: 0%
+            </span>
+            <span class="text-sm font-bold text-gray-700 w-24 text-right" th:if="${!jpMismatch}">완벽 일치</span>
+        </div>
+
+        <!-- 라운드별 설득률 (불일치 차원만 표시) -->
+        <div class="round-rates-container" th:if="${jpMismatch}">
+            <div class="text-xs font-semibold text-gray-600 mb-2">라운드별 설득률</div>
+            <div th:if="${jpRoundRates != null and !jpRoundRates.isEmpty()}">
+                <div class="round-rate-item" th:each="rate, iterStat : ${jpRoundRates}">
+                    <span class="round-label" th:text="|라운드 ${iterStat.index + 1}|">라운드 1</span>
+                    <div class="round-rate-bar">
+                        <div class="round-rate-fill" th:style="|width: ${rate}%;|"></div>
+                    </div>
+                    <span class="round-rate-value" th:text="|${rate}%|">0%</span>
+                </div>
+            </div>
+            <div class="text-xs text-gray-400 italic" th:if="${jpRoundRates == null or jpRoundRates.isEmpty()}">
+                라운드 데이터가 없습니다.
+            </div>
         </div>
 
         <div class="flex items-center text-sm font-semibold text-green-600 pt-1">
             <i data-lucide="check-square" class="result-icon icon-check mr-1"></i>
-            100% 일치
+            <span th:if="${jpMismatch}">설득력 있는 논거를 제시했습니다!</span>
+            <span th:if="${!jpMismatch}">100% 일치</span>
         </div>
     </div>
 </div>
