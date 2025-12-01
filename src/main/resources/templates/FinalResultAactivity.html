@@ -12,6 +12,8 @@
             --primary-purple: #a238ff;
             --secondary-pink: #ff3ca6;
             --bg-gradient: radial-gradient(circle at top left, #e0f2fe 0%, #f3e8ff 50%, #ffffff 100%);
+            --button-gradient-base: linear-gradient(90deg, #b862ff, #ff71c6);
+            --button-gradient-hover: linear-gradient(90deg, #a238ff, #ff3ca6);
         }
 
         body {
@@ -32,29 +34,6 @@
             display: flex;
             align-items: center;
             padding: 1rem 1.5rem;
-        }
-
-        /* 설득 결과 요약 박스 스타일 */
-        .persuasion-summary-box {
-            background-color: #e0f2fe;
-            border-radius: 8px;
-            padding: 1rem;
-            font-weight: 500;
-            color: #1e40af;
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .persuasion-summary-box i {
-            color: #f59e0b;
-            margin-right: 0.5rem;
-        }
-
-        /* 최종 결과 전용 스타일 */
-        .result-header {
-            text-align: center;
-            padding-bottom: 1rem;
         }
 
         /* MBTI 결과 태그 스타일 */
@@ -150,14 +129,11 @@
             text-align: center;
             width: 32px;
         }
-        .tag-e, .tag-i, .tag-s, .tag-n, .tag-t, .tag-f, .tag-j, .tag-p {
-            background-color: #6C5CE7;
+        .tag-blue {
+            background-color: #3b82f6;
         }
-        .tag-e, .tag-s, .tag-t, .tag-j {
-            background-color: #6C5CE7;
-        }
-        .tag-i, .tag-n, .tag-f, .tag-p {
-            background-color: #1A73E8;
+        .tag-gray {
+            background-color: #9ca3af;
         }
         .dim-row {
             display: flex;
@@ -172,13 +148,64 @@
             margin: 0 1rem;
         }
         .dim-bar-container {
-            height: 30px;
+            height: 40px;
             background-color: #f3f4f6;
-            border-radius: 4px;
+            border-radius: 8px;
             overflow: hidden;
+            position: relative;
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+        .dim-bar-visual {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+        .dim-bar-left {
+            height: 100%;
+            position: relative;
             display: flex;
             align-items: center;
-            margin-top: 4px;
+            justify-content: center;
+        }
+        .dim-bar-right {
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: row-reverse;
+        }
+        .dim-bar-fill {
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .dim-bar-fill-blue {
+            background-color: #6C5CE7;
+        }
+        .dim-bar-fill-gray {
+            background-color: #9ca3af;
+        }
+        .dim-bar-text {
+            position: relative;
+            z-index: 10;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .dim-bar-change {
+            font-size: 0.625rem;
+            font-weight: 500;
+            opacity: 0.9;
         }
         .dim-percent {
             width: 50%;
@@ -229,6 +256,24 @@
             width: 3rem;
             text-align: right;
         }
+
+        /* 홈으로 가기 버튼 스타일 */
+        #home-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            background-image: var(--button-gradient-base);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(162, 56, 255, 0.4);
+            transition: background-image 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+            text-decoration: none;
+        }
+
+        #home-button:hover {
+            background-image: var(--button-gradient-hover);
+        }
     </style>
 </head>
 <body class="flex justify-center py-8 px-4">
@@ -254,117 +299,131 @@
         </div>
     </div>
 
-    <div class="ui-card mb-6">
-        <h5 class="font-bold text-gray-800 mb-3">AI의 생각 변화</h5>
-        <div class="space-y-2 text-sm text-gray-700">
-            <div class="flex justify-between items-center" th:if="${eiPersuasionRate != 0}">
-                <span th:text="|AI의 ${ei} 성향 <strong>${eiPersuasionRate}%</strong> 변화|">AI의 E 성향 <strong>91%</strong> 변화</span>
-                <span class="text-gray-500" th:text="|${aiEi} &rarr; ${ei}|">I &rarr; E</span>
-            </div>
-            <div class="flex justify-between items-center" th:if="${snPersuasionRate != 0}">
-                <span th:text="|AI의 ${sn} 성향 <strong>${snPersuasionRate}%</strong> 변화|">AI의 S 성향 <strong>0%</strong> 변화</span>
-                <span class="text-gray-500" th:text="|${aiSn} &rarr; ${sn}|">S &rarr; S</span>
-            </div>
-            <div class="flex justify-between items-center" th:if="${tfPersuasionRate != 0}">
-                <span th:text="|AI의 ${tf} 성향 <strong>${tfPersuasionRate}%</strong> 변화|">AI의 T 성향 <strong>100%</strong> 변화</span>
-                <span class="text-gray-500" th:text="|${aiTf} &rarr; ${tf}|">F &rarr; T</span>
-            </div>
-            <div class="flex justify-between items-center" th:if="${jpPersuasionRate != 0}">
-                <span th:text="|AI의 ${jp} 성향 <strong>${jpPersuasionRate}%</strong> 변화|">AI의 J 성향 <strong>0%</strong> 변화</span>
-                <span class="text-gray-500" th:text="|${aiJp} &rarr; ${jp}|">J &rarr; J</span>
-            </div>
-        </div>
-    </div>
-
     <div class="ai-analysis-card">
         <div class="ai-analysis-header">
             <i data-lucide="line-chart" class="w-5 h-5 mr-2"></i>
             AI 분석 상세 지표 (퍼센트)
         </div>
 
-        <div class="dim-row">
-            <div class="mbti-dim-tag tag-e">E 외향</div>
-            <div class="dim-center">에너지의 방향성</div>
-            <div class="mbti-dim-tag tag-i">내향 I</div>
-        </div>
-        <div class="dim-bar-container mb-4">
-            <div class="dim-percent">
-                <span class="text-gray-400" th:text="|${valueE}%|">30%</span>
-                <span th:text="|${finalE}%|"
-                      th:class="${eiMismatch and ei == 'E'} ? 'text-green-600' : 'text-gray-400'">30%</span>
+        <div th:if="${eiPersuaded}">
+            <div class="dim-row">
+                <div class="mbti-dim-tag" th:classappend="${finalE >= finalI} ? 'tag-blue' : 'tag-gray'">E</div>
+                <div class="dim-center">에너지의 방향성</div>
+                <div class="mbti-dim-tag" th:classappend="${finalI >= finalE} ? 'tag-blue' : 'tag-gray'">I</div>
             </div>
-            <div class="dim-percent text-right">
-                <span th:text="|${finalI}%|"
-                      th:class="${eiMismatch and ei == 'I'} ? 'text-green-600' : 'text-gray-400'">70%</span>
-                <span class="text-gray-400" th:text="|${valueI}%|">70%</span>
-            </div>
-        </div>
-
-        <div class="dim-row">
-            <div class="mbti-dim-tag tag-s">S 감각</div>
-            <div class="dim-center">인식 기능</div>
-            <div class="mbti-dim-tag tag-n">직관 N</div>
-        </div>
-        <div class="dim-bar-container mb-4">
-            <div class="dim-percent">
-                <span class="text-gray-400" th:text="|${valueS}%|">85%</span>
-                <span th:text="|${finalS}%|"
-                      th:class="${snMismatch and sn == 'S'} ? 'text-green-600' : 'text-gray-400'">85%</span>
-            </div>
-            <div class="dim-percent text-right">
-                <span th:text="|${finalN}%|"
-                      th:class="${snMismatch and sn == 'N'} ? 'text-green-600' : 'text-gray-400'">15%</span>
-                <span class="text-gray-400" th:text="|${valueN}%|">15%</span>
+            <div class="dim-bar-container">
+                <div class="dim-bar-visual">
+                    <div class="dim-bar-left" th:style="|width: ${finalE}%;|">
+                        <div class="dim-bar-fill dim-bar-fill-blue" th:style="|width: 100%;|" th:if="${finalE >= finalI}"></div>
+                        <div class="dim-bar-fill dim-bar-fill-gray" th:style="|width: 100%;|" th:if="${finalE < finalI}"></div>
+                        <div class="dim-bar-text">
+                            <span th:text="|${finalE}%|">72%</span>
+                            <span class="dim-bar-change" th:if="${changeE != null and changeE > 0}" th:text="|+${changeE}%|">+27%</span>
+                        </div>
+                    </div>
+                    <div class="dim-bar-right" th:style="|width: ${finalI}%;|">
+                        <div class="dim-bar-fill dim-bar-fill-blue" th:style="|width: 100%;|" th:if="${finalI >= finalE}"></div>
+                        <div class="dim-bar-fill dim-bar-fill-gray" th:style="|width: 100%;|" th:if="${finalI < finalE}"></div>
+                        <div class="dim-bar-text">
+                            <span th:text="|${finalI}%|">28%</span>
+                            <span class="dim-bar-change" th:if="${changeI != null and changeI > 0}" th:text="|+${changeI}%|">+5%</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="dim-row">
-            <div class="mbti-dim-tag tag-t">T 사고</div>
-            <div class="dim-center">판단 기능</div>
-            <div class="mbti-dim-tag tag-f">감정 F</div>
-        </div>
-        <div class="dim-bar-container mb-4">
-            <div class="dim-percent">
-                <span class="text-gray-400" th:text="|${valueT}%|">20%</span>
-                <span th:text="|${finalT}%|"
-                      th:class="${tfMismatch and tf == 'T'} ? 'text-green-600' : 'text-gray-400'">20%</span>
+        <div th:if="${snPersuaded}">
+            <div class="dim-row">
+                <div class="mbti-dim-tag" th:classappend="${finalS >= finalN} ? 'tag-blue' : 'tag-gray'">S</div>
+                <div class="dim-center">인식 기능</div>
+                <div class="mbti-dim-tag" th:classappend="${finalN >= finalS} ? 'tag-blue' : 'tag-gray'">N</div>
             </div>
-            <div class="dim-percent text-right">
-                <span th:text="|${finalF}%|"
-                      th:class="${tfMismatch and tf == 'F'} ? 'text-green-600' : 'text-gray-400'">80%</span>
-                <span class="text-gray-400" th:text="|${valueF}%|">80%</span>
-            </div>
-        </div>
-
-        <div class="dim-row">
-            <div class="mbti-dim-tag tag-j">J 판단</div>
-            <div class="dim-center">생활 양식</div>
-            <div class="mbti-dim-tag tag-p">인식 P</div>
-        </div>
-        <div class="dim-bar-container">
-            <div class="dim-percent">
-                <span class="text-gray-400" th:text="|${valueJ}%|">25%</span>
-                <span th:text="|${finalJ}%|"
-                      th:class="${jpMismatch and jp == 'J'} ? 'text-green-600' : 'text-gray-400'">25%</span>
-            </div>
-            <div class="dim-percent text-right">
-                <span th:text="|${finalP}%|"
-                      th:class="${jpMismatch and jp == 'P'} ? 'text-green-600' : 'text-gray-400'">75%</span>
-                <span class="text-gray-400" th:text="|${valueP}%|">75%</span>
+            <div class="dim-bar-container">
+                <div class="dim-bar-visual">
+                    <div class="dim-bar-left" th:style="|width: ${finalS}%;|">
+                        <div class="dim-bar-fill dim-bar-fill-blue" th:style="|width: 100%;|" th:if="${finalS >= finalN}"></div>
+                        <div class="dim-bar-fill dim-bar-fill-gray" th:style="|width: 100%;|" th:if="${finalS < finalN}"></div>
+                        <div class="dim-bar-text">
+                            <span th:text="|${finalS}%|">75%</span>
+                            <span class="dim-bar-change" th:if="${changeS != null and changeS > 0}" th:text="|+${changeS}%|">+5%</span>
+                        </div>
+                    </div>
+                    <div class="dim-bar-right" th:style="|width: ${finalN}%;|">
+                        <div class="dim-bar-fill dim-bar-fill-blue" th:style="|width: 100%;|" th:if="${finalN >= finalS}"></div>
+                        <div class="dim-bar-fill dim-bar-fill-gray" th:style="|width: 100%;|" th:if="${finalN < finalS}"></div>
+                        <div class="dim-bar-text">
+                            <span th:text="|${finalN}%|">25%</span>
+                            <span class="dim-bar-change" th:if="${changeN != null and changeN > 0}" th:text="|+${changeN}%|">+5%</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <p class="text-xs text-gray-500 mt-4 text-center">
-            * 왼/오: 초기 분석 퍼센트 &rarr; 설득 후 최종 퍼센트
-        </p>
+        <div th:if="${tfPersuaded}">
+            <div class="dim-row">
+                <div class="mbti-dim-tag" th:classappend="${finalT >= finalF} ? 'tag-blue' : 'tag-gray'">T</div>
+                <div class="dim-center">판단 기능</div>
+                <div class="mbti-dim-tag" th:classappend="${finalF >= finalT} ? 'tag-blue' : 'tag-gray'">F</div>
+            </div>
+            <div class="dim-bar-container">
+                <div class="dim-bar-visual">
+                    <div class="dim-bar-left" th:style="|width: ${finalT}%;|">
+                        <div class="dim-bar-fill dim-bar-fill-blue" th:style="|width: 100%;|" th:if="${finalT >= finalF}"></div>
+                        <div class="dim-bar-fill dim-bar-fill-gray" th:style="|width: 100%;|" th:if="${finalT < finalF}"></div>
+                        <div class="dim-bar-text">
+                            <span th:text="|${finalT}%|">61%</span>
+                            <span class="dim-bar-change" th:if="${changeT != null and changeT > 0}" th:text="|+${changeT}%|">+5%</span>
+                        </div>
+                    </div>
+                    <div class="dim-bar-right" th:style="|width: ${finalF}%;|">
+                        <div class="dim-bar-fill dim-bar-fill-blue" th:style="|width: 100%;|" th:if="${finalF >= finalT}"></div>
+                        <div class="dim-bar-fill dim-bar-fill-gray" th:style="|width: 100%;|" th:if="${finalF < finalT}"></div>
+                        <div class="dim-bar-text">
+                            <span th:text="|${finalF}%|">39%</span>
+                            <span class="dim-bar-change" th:if="${changeF != null and changeF > 0}" th:text="|+${changeF}%|">+5%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${jpPersuaded}">
+            <div class="dim-row">
+                <div class="mbti-dim-tag" th:classappend="${finalJ >= finalP} ? 'tag-blue' : 'tag-gray'">J</div>
+                <div class="dim-center">생활 양식</div>
+                <div class="mbti-dim-tag" th:classappend="${finalP >= finalJ} ? 'tag-blue' : 'tag-gray'">P</div>
+            </div>
+            <div class="dim-bar-container">
+                <div class="dim-bar-visual">
+                    <div class="dim-bar-left" th:style="|width: ${finalJ}%;|">
+                        <div class="dim-bar-fill dim-bar-fill-blue" th:style="|width: 100%;|" th:if="${finalJ >= finalP}"></div>
+                        <div class="dim-bar-fill dim-bar-fill-gray" th:style="|width: 100%;|" th:if="${finalJ < finalP}"></div>
+                        <div class="dim-bar-text">
+                            <span th:text="|${finalJ}%|">80%</span>
+                            <span class="dim-bar-change" th:if="${changeJ != null and changeJ > 0}" th:text="|+${changeJ}%|">+5%</span>
+                        </div>
+                    </div>
+                    <div class="dim-bar-right" th:style="|width: ${finalP}%;|">
+                        <div class="dim-bar-fill dim-bar-fill-blue" th:style="|width: 100%;|" th:if="${finalP >= finalJ}"></div>
+                        <div class="dim-bar-fill dim-bar-fill-gray" th:style="|width: 100%;|" th:if="${finalP < finalJ}"></div>
+                        <div class="dim-bar-text">
+                            <span th:text="|${finalP}%|">20%</span>
+                            <span class="dim-bar-change" th:if="${changeP != null and changeP > 0}" th:text="|+${changeP}%|">+5%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
     <div class="flex items-center text-gray-600 font-bold mb-4">
         <i data-lucide="zap" class="w-5 h-5 mr-2 text-purple-500"></i>
         <h4 class="text-lg">차원별 대결 결과</h4>
     </div>
 
-    <!-- 에너지 방향 (EI) - 설득을 시도했고 불일치가 있는 경우만 표시 -->
-    <div class="dimension-result-card space-y-3" th:if="${eiPersuaded and eiMismatch}" th:classappend="'mismatch-success'">
+    <div class="dimension-result-card space-y-3" th:if="${eiPersuaded}" th:classappend="${eiMismatch} ? 'mismatch-success' : 'match-perfect'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">에너지 방향</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
@@ -409,8 +468,7 @@
         </div>
     </div>
 
-    <!-- 인식 기능 (SN) - 설득을 시도했고 불일치가 있는 경우만 표시 -->
-    <div class="dimension-result-card space-y-3" th:if="${snPersuaded and snMismatch}" th:classappend="'mismatch-success'">
+    <div class="dimension-result-card space-y-3" th:if="${snPersuaded}" th:classappend="${snMismatch} ? 'mismatch-success' : 'match-perfect'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">인식 기능</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
@@ -455,8 +513,7 @@
         </div>
     </div>
 
-    <!-- 판단 기능 (TF) - 설득을 시도했고 불일치가 있는 경우만 표시 -->
-    <div class="dimension-result-card space-y-3" th:if="${tfPersuaded and tfMismatch}" th:classappend="'mismatch-success'">
+    <div class="dimension-result-card space-y-3" th:if="${tfPersuaded}" th:classappend="${tfMismatch} ? 'mismatch-success' : 'match-perfect'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">판단 기능</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
@@ -501,8 +558,7 @@
         </div>
     </div>
 
-    <!-- 생활 양식 (JP) - 설득을 시도했고 불일치가 있는 경우만 표시 -->
-    <div class="dimension-result-card space-y-3" th:if="${jpPersuaded and jpMismatch}" th:classappend="'mismatch-success'">
+    <div class="dimension-result-card space-y-3" th:if="${jpPersuaded}" th:classappend="${jpMismatch} ? 'mismatch-success' : 'match-perfect'">
         <div class="flex justify-between items-center">
             <span class="font-bold text-gray-800">생활 양식</span>
             <div class="flex items-center space-x-1 text-sm font-semibold">
@@ -546,7 +602,16 @@
             <span th:if="${!jpMismatch}">100% 일치</span>
         </div>
     </div>
+
+    <div class="max-w-xl w-full pt-6">
+        <a th:href="@{/}" id="home-button" class="w-full font-bold py-3 rounded-full shadow-lg text-lg">
+            <span>홈으로 가기</span>
+            <i data-lucide="home" class="w-5 h-5"></i>
+        </a>
+    </div>
+
 </div>
+
 
 <script>
     // Lucide Icons 초기화

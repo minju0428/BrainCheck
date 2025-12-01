@@ -703,6 +703,25 @@ public class PersuasionBattleController {
         model.addAttribute("finalF", finalF);
         model.addAttribute("finalJ", finalJ);
         model.addAttribute("finalP", finalP);
+        
+        // 변화량 계산 (설득한 경우만)
+        int changeE = (eiMismatch && ei.equals("E")) ? (finalE - initialE) : 0;
+        int changeI = (eiMismatch && ei.equals("I")) ? (finalI - initialI) : 0;
+        int changeS = (snMismatch && sn.equals("S")) ? (finalS - initialS) : 0;
+        int changeN = (snMismatch && sn.equals("N")) ? (finalN - initialN) : 0;
+        int changeT = (tfMismatch && tf.equals("T")) ? (finalT - initialT) : 0;
+        int changeF = (tfMismatch && tf.equals("F")) ? (finalF - initialF) : 0;
+        int changeJ = (jpMismatch && jp.equals("J")) ? (finalJ - initialJ) : 0;
+        int changeP = (jpMismatch && jp.equals("P")) ? (finalP - initialP) : 0;
+        
+        model.addAttribute("changeE", changeE);
+        model.addAttribute("changeI", changeI);
+        model.addAttribute("changeS", changeS);
+        model.addAttribute("changeN", changeN);
+        model.addAttribute("changeT", changeT);
+        model.addAttribute("changeF", changeF);
+        model.addAttribute("changeJ", changeJ);
+        model.addAttribute("changeP", changeP);
 
         log.info("=== 최종 결과 페이지 ===");
         log.info("차원별 설득률: EI={}, SN={}, TF={}, JP={}", eiPersuasionRate, snPersuasionRate, tfPersuasionRate, jpPersuasionRate);
