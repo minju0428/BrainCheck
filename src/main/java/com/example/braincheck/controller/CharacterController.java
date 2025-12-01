@@ -40,8 +40,15 @@ public class CharacterController {
 
     @GetMapping("/input")
     public String showInput(Model model) {
-        //사용자 입력을 받을 '데이터 그릇' 생성
-        model.addAttribute("characterFormDto", new CharacterFormDto());
+        // Flash Attribute에서 characterFormDto를 가져오거나 새로 생성
+        if (!model.containsAttribute("characterFormDto")) {
+            model.addAttribute("characterFormDto", new CharacterFormDto());
+        }
+        // Flash Attribute에서 errorMessage 확인
+        if (model.containsAttribute("errorMessage")) {
+            String errorMessage = (String) model.asMap().get("errorMessage");
+            log.info("GET /input: Flash Attribute에서 errorMessage 확인: {}", errorMessage);
+        }
         //입력 화면 반환
         return "InputActivity";
     }
@@ -132,22 +139,26 @@ public class CharacterController {
                    return "redirect:/mbti-ui";
                } else {
                    //검증에 실패한 경우
-                   String generalErrorMessage = "입력하신 정보 중 일부가 일치하지 않아 분석할 수 없습니다. 다시 확인해주세요.";
+                   String errorMessage = "입력하신 정보가 존재하지 않습니다. 다시 확인해주세요.";
 
                    //항목별 구체적인 에러 메시지
                    if("없음".equals(validationMap.get("등장인물 여부"))){
                        //등장인물: 없음 인 경우
-                       // code, args(빈 배열), defaultMessage 순으로 인자를 맞춥니다.
-                       bindingResult.reject("validation.failure.character", new Object[0], "입력하신 등장인물 정보가 작품에 존재하지 않습니다.");
-                   }
-                   if("없음".equals(validationMap.get("제목 여부"))){
+                       errorMessage = "입력하신 등장인물 정보가 작품에 존재하지 않습니다. 다시 확인해주세요.";
+                   } else if("없음".equals(validationMap.get("제목 여부"))){
                        //제목: 없음 인 경우
-                       bindingResult.reject("validation.failure.title", new Object[0], "입력하신 작품 제목이 존재하지 않거나 카테고리와 일치하지 않습니다.");
+                       errorMessage = "입력하신 작품 제목이 존재하지 않거나 카테고리와 일치하지 않습니다. 다시 확인해주세요.";
                    }
 
                    log.info("AI 검증 실패: 존재 여부='{}' (입력 정보: {} / {})", existence, characterForm.getTitle(), characterForm.getCharacterName());
+                   log.info("에러 메시지: {}", errorMessage);
 
-                   return "InputActivity";
+                   // Flash Attribute로 에러 메시지 전달 (UI는 그대로 유지)
+                   redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
+                   redirectAttributes.addFlashAttribute("characterFormDto", characterForm);
+                   log.info("Flash Attribute에 errorMessage 추가 완료: {}", errorMessage);
+                   
+                   return "redirect:/character/input";
                }
 
 

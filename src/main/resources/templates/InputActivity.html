@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,10 +34,64 @@
       box-shadow: 0 4px 15px rgba(162, 56, 255, 0.2);
       background-color: #f7f0ff;
     }
+
+    /* 토스트 메시지 스타일 */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: linear-gradient(90deg, var(--primary-purple), var(--secondary-pink));
+      color: white;
+      padding: 16px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(162, 56, 255, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      max-width: 400px;
+      animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+      font-weight: 500;
+    }
+
+    .toast i {
+      flex-shrink: 0;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+        transform: translateX(400px);
+      }
+    }
   </style>
 </head>
 
 <body class="flex justify-center py-10 md:py-20 px-4">
+
+<!-- 토스트 메시지 컨테이너 -->
+<div class="toast-container" id="toastContainer"></div>
 
 <div class="max-w-xl w-full space-y-8">
 
@@ -48,6 +102,7 @@
       <input type="hidden" id="hiddenTitle" th:value="${title}" />
       <input type="hidden" id="hiddenCharacterName" th:value="${characterName}" />
       <input type="hidden" id="hiddenCategory" th:value="${category}" />
+      <input type="hidden" id="hiddenErrorMessage" th:value="${errorMessage}" />
 
       <input type="hidden" id="hiddenValueE" th:value="${valueE}" />
       <input type="hidden" id="hiddenValueI" th:value="${valueI}" />
@@ -186,6 +241,67 @@
         }
       });
     });
+  });
+
+  // 토스트 메시지 표시 함수
+  function showToast(message) {
+    const toastContainer = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `
+      <i data-lucide="alert-circle" class="w-5 h-5"></i>
+      <span>${message}</span>
+    `;
+    toastContainer.appendChild(toast);
+    
+    // 아이콘 렌더링
+    lucide.createIcons();
+    
+    // 3초 후 제거
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
+
+  // 서버에서 전달된 에러 메시지가 있으면 토스트로 표시
+  function checkAndShowErrorMessage() {
+    const hiddenErrorMessage = document.getElementById('hiddenErrorMessage');
+    if (hiddenErrorMessage && hiddenErrorMessage.value && hiddenErrorMessage.value.trim() !== '') {
+      console.log('에러 메시지 발견:', hiddenErrorMessage.value);
+      showToast(hiddenErrorMessage.value);
+    }
+  }
+  
+  // DOM이 로드된 후 실행
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkAndShowErrorMessage);
+  } else {
+    // DOM이 이미 로드된 경우 즉시 실행
+    checkAndShowErrorMessage();
+  }
+
+  // 폼 제출 검증
+  const form = document.querySelector('form');
+  form.addEventListener('submit', (e) => {
+    const characterName = document.querySelector('input[name="characterName"]').value.trim();
+    const title = document.querySelector('input[name="title"]').value.trim();
+    const category = categoryInput.value;
+
+    let errorMessage = '';
+
+    if (!characterName) {
+      errorMessage = '등장인물 이름을 입력해주세요.';
+    } else if (!title) {
+      errorMessage = '작품 제목을 입력해주세요.';
+    } else if (!category) {
+      errorMessage = '카테고리를 선택해주세요.';
+    }
+
+    if (errorMessage) {
+      e.preventDefault(); // 폼 제출 중단
+      showToast(errorMessage);
+      return false;
+    }
   });
 </script>
 
