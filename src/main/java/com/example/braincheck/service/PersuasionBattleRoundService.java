@@ -52,7 +52,7 @@ public class PersuasionBattleRoundService {
         // 차원별 최종 설득률을 저장하는 Map (결과 페이지에서 사용)
         @SuppressWarnings("unchecked")
         Map<String, Integer> dimensionPersuasionRateMap = (Map<String, Integer>) currentData.getOrDefault("dimensionPersuasionRateMap", new HashMap<>());
-        
+
         // 차원별 라운드별 설득률을 저장하는 Map (결과 페이지에서 사용)
         @SuppressWarnings("unchecked")
         Map<String, List<Integer>> dimensionRoundRateMap = (Map<String, List<Integer>>) currentData.getOrDefault("dimensionRoundRateMap", new HashMap<>());
@@ -100,7 +100,8 @@ public class PersuasionBattleRoundService {
 
         // 4. 설득률 업데이트 (누적, 최대 100까지)
         int newPersuasionRate = Math.min(100, persuasionRate + scoreGained);
-        persuasionRateList.add(newPersuasionRate);
+        // 라운드별로 얻은 점수만 저장 (누적값이 아닌 각 라운드 점수)
+        persuasionRateList.add(scoreGained);
         if (scoreGained > 0) {
             persuasionGainList.add(scoreGained);
         }
@@ -131,9 +132,9 @@ public class PersuasionBattleRoundService {
             // 저장 직후 검증 로그 추가
             if (dimensionRoundRateMap.containsKey(dimension)) {
                 List<Integer> savedRates = dimensionRoundRateMap.get(dimension);
-                log.info("✅ 차원 {} 저장 검증 완료. 저장된 데이터: {}", dimension, savedRates);
+                log.info("차원 {} 저장 검증 완료. 저장된 데이터: {}", dimension, savedRates);
             } else {
-                log.error("❌ 차원 {} 저장 실패!", dimension);
+                log.error("차원 {} 저장 실패!", dimension);
             }
             // 현재 차원 (dimension)을 battleList에서 제거
             battleList.remove(dimension);
@@ -188,9 +189,7 @@ public class PersuasionBattleRoundService {
 
     /**
      * AiPromptService.analyzePersuasionEvidence()의 텍스트 응답을 파싱해서 Score(정수)와
-     * Feedback(문장)을 추출하는 메서드.
-     *
-     * 기대 형식: Score: 35 Feedback: 사용자의 논리가 구체적이고 설득력이 있습니다...
+     * Feedback(문장)을 추출하는 메서드
      */
     private AiRoundResult parseAiPersuasionResponse(String aiResponseText) {
         if (aiResponseText == null) {
